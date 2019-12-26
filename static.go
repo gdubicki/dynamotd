@@ -27,7 +27,7 @@ func printStaticRow(row Row) {
 			valueToPrint += getStringToPrint(colorString)
 		}
 
-		fmt.Printf("%s : %s\n", labelToPrint, valueToPrint)
+		fmt.Printf("%-20s : %s\n", labelToPrint, valueToPrint)
 	}
 }
 
