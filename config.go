@@ -17,6 +17,7 @@ func configure() {
 		"emptyLine",
 		"fqdn",
 		"ip",
+		"uptime",
 		"emptyLine",
 		"load",
 	})
@@ -68,6 +69,8 @@ func getRows() []Row {
 			rows = append(rows, load())
 		case "ip":
 			rows = append(rows, ip())
+		case "uptime":
+			rows = append(rows, uptime())
 		default:
 			panic(fmt.Errorf("error while generating row from string '%s' - check for typos", rowString))
 		}
