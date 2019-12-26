@@ -55,7 +55,7 @@ func getRows() []Row {
 		case "load":
 			rows = append(rows, load())
 		default:
-			panic(fmt.Errorf("Error while generating row '%s' - check for typos!\n"))
+			panic(fmt.Errorf("Error while generating row from string '%s' - check for typos!\n", rowString))
 		}
 	}
 
