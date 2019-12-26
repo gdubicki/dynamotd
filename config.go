@@ -21,6 +21,7 @@ func configure() {
 		"emptyLine",
 		"cores",
 		"load",
+		"memory",
 	})
 
 	config.SetConfigName("dynamotd.yaml")
@@ -74,6 +75,8 @@ func getRows() []Row {
 			rows = append(rows, uptime())
 		case "cores":
 			rows = append(rows, cores())
+		case "memory":
+			rows = append(rows, memory())
 		default:
 			panic(fmt.Errorf("error while generating row from string '%s' - check for typos", rowString))
 		}

@@ -6,10 +6,10 @@ import (
 	"runtime"
 )
 
-var warningThreshold = 0.9
-var criticalThreshold = 1.1
-
 func load() Row {
+	var warningThreshold = 0.9
+	var criticalThreshold = 1.1
+
 	var cores = float64(runtime.NumCPU())
 
 	var load1, load5, load15 float64
