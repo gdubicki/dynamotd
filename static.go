@@ -16,7 +16,6 @@ func printStaticRow(row Row) {
 	if row.isEmptyLine() {
 		fmt.Print("\n")
 	} else {
-
 		labelToPrint := ""
 		valueToPrint := ""
 
@@ -31,7 +30,6 @@ func printStaticRow(row Row) {
 		fmt.Printf("%s : %s\n", labelToPrint, valueToPrint)
 	}
 }
-
 
 func getStringToPrint(colorString ColorString) string {
 	// generate function that prints in given color

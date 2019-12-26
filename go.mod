@@ -10,4 +10,5 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.11 // indirect
 	github.com/rivo/tview v0.0.0-20191129065140-82b05c9fb329 // indirect
+	github.com/spf13/viper v1.6.1
 )

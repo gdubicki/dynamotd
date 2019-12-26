@@ -1,16 +1,17 @@
 package main
 
+import "fmt"
+
+func init() {
+	configure()
+}
+
 func main() {
+	rows := getRows()
 
-	// TODO: make rows configurable
-	rows := []Row {
-		timestamp(),
-		emptyLine(),
-		fqdn(),
-		emptyLine(),
-		load(),
+	if isModeStatic() {
+		printStatic(rows)
+	} else {
+		fmt.Printf("Other modes than 'static' not supported yet!")
 	}
-
-	// TODO: add optional (default?) dynamic mode
-	printStatic(rows)
 }
