@@ -1,0 +1,6 @@
+mode: static
+
+rows:
+  - timestamp
+  - emptyLine
+#  - foo

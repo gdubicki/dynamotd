@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var MaxRows = 40
+
 var config = viper.New()
 
 func configure() {
@@ -18,7 +20,7 @@ func configure() {
 		"load",
 	})
 
-	config.SetConfigName("dynamotd.conf")
+	config.SetConfigName("dynamotd.yaml")
 	config.AddConfigPath("/etc/")
 	config.AddConfigPath("$HOME/.dynamotd")
 	config.AddConfigPath(".")
@@ -42,6 +44,15 @@ func getRows() []Row {
 	var rows []Row
 
 	rowsStrings := config.GetStringSlice("rows")
+
+	if len(rowsStrings) == 0 {
+		panic(fmt.Errorf("no rows defined"))
+	}
+
+	if len(rowsStrings) > MaxRows {
+		panic(fmt.Errorf("more rows than %d not supported", MaxRows))
+	}
+
 	for _, rowString := range rowsStrings {
 
 		// TODO: consider using reflection to be able to add row types without editing this file
@@ -55,7 +66,7 @@ func getRows() []Row {
 		case "load":
 			rows = append(rows, load())
 		default:
-			panic(fmt.Errorf("Error while generating row from string '%s' - check for typos!\n", rowString))
+			panic(fmt.Errorf("error while generating row from string '%s' - check for typos", rowString))
 		}
 	}
 
