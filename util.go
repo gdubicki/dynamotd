@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/fatih/color"
-	"github.com/gdamore/tcell"
 )
 
 type Row struct {
@@ -21,14 +20,14 @@ type ColorString struct {
 
 type Color struct {
 	staticColor color.Attribute
-	dynamicColor tcell.Color
+	dynamicColor string
 }
 
-var labelColor = Color{color.FgWhite, tcell.ColorWhite}
-var valueColor = Color{color.FgBlue, tcell.ColorWhiteSmoke}
-var keyValueOkColor = Color{color.FgGreen, tcell.ColorGreen}
-var keyValueWarningColor = Color{color.FgYellow, tcell.ColorYellow}
-var keyValueCriticalColor = Color{color.FgRed, tcell.ColorRed}
+var labelColor = Color{color.FgWhite, "white"}
+var valueColor = Color{color.FgBlue, "lightblue"}
+var keyValueOkColor = Color{color.FgGreen, "lightgreen"}
+var keyValueWarningColor = Color{color.FgYellow, "lightgoldenrodyellow"}
+var keyValueCriticalColor = Color{color.FgRed, "indianred"}
 
 func value(text string) ColorString {
 	return  ColorString{valueColor, text}

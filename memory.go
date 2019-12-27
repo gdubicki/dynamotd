@@ -18,9 +18,9 @@ func memory() Row {
 	memoryTotalBytes := float64(memoryStat.Total)
 	memoryFreeBytes := float64(memoryStat.Free)
 
-	if memoryFreeBytes <= criticalThreshold * memoryTotalBytes {
+	if memoryFreeBytes <= criticalThreshold*memoryTotalBytes {
 		color = keyValueCriticalColor
- 	} else if memoryFreeBytes <= warningThreshold * memoryTotalBytes {
+	} else if memoryFreeBytes <= warningThreshold*memoryTotalBytes {
 		color = keyValueWarningColor
 	} else {
 		color = keyValueOkColor

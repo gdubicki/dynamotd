@@ -1,0 +1,6 @@
+mode: dynamic
+
+#rows:
+#  - timestamp
+#  - emptyLine
+#  - foo
