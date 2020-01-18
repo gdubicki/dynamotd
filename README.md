@@ -9,16 +9,16 @@ it, then something IS wrong with the server, isn't it?).
 
 ## Features
 
-* Useful default info - CPU Load, Memory use, Network use, Disk space use etc.,
-* Customizable - reorder and remove default lines,
-* Pluggable - add custom lines with any label and any command(s) output as the value,
-* Semantic colors - for example red if load is higher than no of cores,
-* Static and dynamic mode - the former just prints the current state, the latter updates every 2 seconds,
+* **Useful default info** - CPU Load, Memory use, Network use, Disk space use etc.,
+* **Semantic colors** - for example red if load is higher than no of cores,
+* **Customizable** - reorder and remove default lines,
+* **Pluggable** - add custom lines with any label and any command(s) output as the value,
+* **Static and dynamic mode** - the former just prints the current state, the latter updates every 2 seconds,
   like htop,
-* Keyboard shortcuts to run popular tools (in dynamic mode only) - like htop, iftop etc.
-* Fast - written in Go for that,
-* Circuit-breaker - minimal info mode in case of server overload detection,
-* Native packages for Centos (RPM) and Ubuntu (DEB) - so you can have on almost all of your servers.
+* **Keyboard shortcuts** - to run popular tools (in dynamic mode only) like htop, iftop etc.
+* **Fast** - written in Go for that,
+* **Circuit-breaker** - minimal info mode in case of server overload detection,
+* **Native packages for Centos and Ubuntu** - so you can easily install it on (almost) all of your servers.
 
 ## Status
 
