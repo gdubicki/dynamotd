@@ -4,8 +4,8 @@ We know: servers, VMs and bare metals are not cool nowadays but you may still ha
 take care of them, so how about making your life a little bit better?
  
 This app provides a [MOTD (Message Of The Day)](https://en.wikipedia.org/wiki/Motd_(Unix)) optimized for 
-providing the key info about your server when you SSH to it, because if you are doing it, then something 
-IS wrong with it (isn't it?).   
+providing the info about your server that YOU need to troubleshoot stuff when you SSH to it (because if you are doing
+it, then something IS wrong with the server, isn't it?).   
 
 ## Features
 
