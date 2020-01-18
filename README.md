@@ -9,7 +9,7 @@ it, then something IS wrong with the server, isn't it?).
 
 ## Features
 
-![Dynamotdb](dynamotdb.png)
+![Dynamotd](dynamotd.png)
 
 * **Useful default info** - CPU Load, Memory use, Network use, Disk space use etc.,
 * **Semantic colors** - for example red if load is higher than no of cores,
