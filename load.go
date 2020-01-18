@@ -49,9 +49,9 @@ func load() Row {
 		//	log.Fatalf("Interpreting 'uptime' load values (%s, %s, %s) failed\n",
 		//		loadAverageStringSplitted[0], loadAverageStringSplitted[1], loadAverageStringSplitted[2])
 		//}
-		load1 = 1.0
+		load1 = 20.0
 		load5 = 12.1
-		load15 = 20.0
+		load15 = 3.0
 	}
 
 	load1color := valueOkColor
