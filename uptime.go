@@ -11,7 +11,7 @@ func uptime() Row {
 	color, uptimeString := getUptimeColorAndString()
 
 	return Row{
-		singleColorLabelText("Uptime"),
+		singleColorLabel("Uptime"),
 		toColorText(
 			ColorString{color, uptimeString},
 		),
@@ -30,11 +30,11 @@ func getUptimeColorAndString() (Color, string) {
 	minutes := ((uptime - (days * 60 * 60 * 24))  -  (hours * 60 * 60)) / 60
 
 	if years >= 1 {
-		color = keyValueCriticalColor
+		color = valueCriticalColor
 	} else if months >= 1 {
-		color = keyValueWarningColor
+		color = valueWarningColor
 	} else {
-		color = keyValueOkColor
+		color = valueOkColor
 	}
 
 	uptimeString := ""

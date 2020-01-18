@@ -15,24 +15,24 @@ func ip() Row {
 	var localIPcolor, externalIPcolor Color
 
 	if strings.Contains(localIP, "can't") {
-		localIPcolor = keyValueCriticalColor
+		localIPcolor = valueCriticalColor
 	} else {
-		localIPcolor = keyValueOkColor
+		localIPcolor = valueNeutralColor
 	}
 
 	if strings.Contains(externalIP, "can't") {
-		externalIPcolor = keyValueCriticalColor
+		externalIPcolor = valueCriticalColor
 	} else {
-		externalIPcolor = keyValueOkColor
+		externalIPcolor = valueNeutralColor
 	}
 
 	return Row{
-		singleColorLabelText("IP"),
+		singleColorLabel("IP"),
 		toColorText(
 			ColorString{localIPcolor, localIP},
-			value(" (external: "),
+			valueDescription(" (external: "),
 			ColorString{externalIPcolor, externalIP},
-			value(")"),
+			valueDescription(")"),
 		),
 	}
 }

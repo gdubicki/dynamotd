@@ -19,23 +19,23 @@ func memory() Row {
 	memoryFreeBytes := float64(memoryStat.Free)
 
 	if memoryFreeBytes <= criticalThreshold*memoryTotalBytes {
-		color = keyValueCriticalColor
+		color = valueCriticalColor
 	} else if memoryFreeBytes <= warningThreshold*memoryTotalBytes {
-		color = keyValueWarningColor
+		color = valueWarningColor
 	} else {
-		color = keyValueOkColor
+		color = valueOkColor
 	}
 
 	memoryTotalGB := memoryTotalBytes / 1024 / 1024 / 1024
 	memoryFreeGB := memoryFreeBytes / 1024 / 1024 / 1024
 
 	return Row{
-		singleColorLabelText("Memory"),
+		singleColorLabel("Memory"),
 		toColorText(
 			ColorString{color, fmt.Sprintf("%.2f GB", memoryFreeGB)},
-			value(" (free) / "),
-			value(fmt.Sprintf("%.2f GB", memoryTotalGB)),
-			value(" (total)"),
+			valueDescription(" (free) / "),
+			valueNeutral(fmt.Sprintf("%.2f GB", memoryTotalGB)),
+			valueDescription(" (total)"),
 		),
 	}
 }

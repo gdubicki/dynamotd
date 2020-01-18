@@ -8,7 +8,7 @@ import (
 func fqdn() Row {
 	fqdnValue := gofqdn.Get()
 	return Row{
-		singleColorLabelText("FQDN"),
-		singleColorValueText(fmt.Sprintf("%s", fqdnValue)),
+		singleColorLabel("FQDN"),
+		singleColorValue(fmt.Sprintf("%s", fqdnValue)),
 	}
 }

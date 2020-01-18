@@ -24,43 +24,48 @@ type Color struct {
 }
 
 var labelColor = Color{color.FgWhite, "white"}
-var valueColor = Color{color.FgBlue, "lightblue"}
-var keyValueOkColor = Color{color.FgGreen, "lightgreen"}
-var keyValueWarningColor = Color{color.FgYellow, "lightgoldenrodyellow"}
-var keyValueCriticalColor = Color{color.FgRed, "indianred"}
+var valueDescriptionColor = Color{color.FgWhite, "white"}
+var valueNeutralColor = Color{color.FgBlue, "lightblue"}
+var valueOkColor = Color{color.FgGreen, "lightgreen"}
+var valueWarningColor = Color{color.FgYellow, "lightgoldenrodyellow"}
+var valueCriticalColor = Color{color.FgRed, "indianred"}
 
-func value(text string) ColorString {
-	return  ColorString{valueColor, text}
+func valueDescription(text string) ColorString {
+	return  ColorString{valueDescriptionColor, text}
 }
 
-func keyValueOk(text string) ColorString {
-	return ColorString{keyValueOkColor, text}
+func valueNeutral(text string) ColorString {
+	return  ColorString{valueNeutralColor, text}
 }
 
-func keyValueWarning(text string) ColorString {
-	return ColorString{keyValueWarningColor, text}
+func valueOk(text string) ColorString {
+	return ColorString{valueOkColor, text}
 }
 
-func keyValueCritical(text string) ColorString {
-	return ColorString{keyValueCriticalColor, text}
+func valueWarning(text string) ColorString {
+	return ColorString{valueWarningColor, text}
+}
+
+func valueCritical(text string) ColorString {
+	return ColorString{valueCriticalColor, text}
 }
 
 // for labels most (every?) of the times we need to have it whole
 // in a single color
-func singleColorLabelText(text string) ColorText {
+func singleColorLabel(text string) ColorText {
 	labelString := ColorString{labelColor, text}
 	singleColorLabel := []ColorString{labelString}
 	return ColorText{singleColorLabel}
 }
 
 // values we also want it in a single color
-func singleColorValueText(text string) ColorText {
-	labelString := ColorString{valueColor, text}
+func singleColorValue(text string) ColorText {
+	labelString := ColorString{valueNeutralColor, text}
 	singleColorLabel := []ColorString{labelString}
 	return ColorText{singleColorLabel}
 }
 
-// merge a bunch of color strings of a value to a single color text element
+// merge a bunch of color strings of a valueDescription to a single color text element
 func toColorText(colorStrings ...ColorString) ColorText {
 	return ColorText{colorStrings}
 }
@@ -68,8 +73,8 @@ func toColorText(colorStrings ...ColorString) ColorText {
 // generating and testing for empty lines
 func emptyLine() Row {
 	return Row{
-		singleColorLabelText(""),
-		singleColorValueText(""),
+		singleColorLabel(""),
+		singleColorValue(""),
 	}
 }
 

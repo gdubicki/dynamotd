@@ -19,8 +19,8 @@ func load() Row {
 		stat, err := linuxproc.ReadLoadAvg("/proc/stat")
 		if err != nil {
 			return Row{
-				singleColorLabelText("Load"),
-				singleColorValueText("Can't read /proc/stat"),
+				singleColorLabel("Load"),
+				singleColorValue("Can't read /proc/stat"),
 			}
 		}
 
@@ -54,40 +54,40 @@ func load() Row {
 		load15 = 20.0
 	}
 
-	load1color := keyValueOkColor
-	load5color := keyValueOkColor
-	load15color := keyValueOkColor
+	load1color := valueOkColor
+	load5color := valueOkColor
+	load15color := valueOkColor
 
 	if load1 >= warningThreshold*cores {
-		load1color = keyValueWarningColor
+		load1color = valueWarningColor
 	}
 	if load5 >= warningThreshold*cores {
-		load5color = keyValueWarningColor
+		load5color = valueWarningColor
 	}
 	if load15 >= warningThreshold*cores {
-		load15color = keyValueWarningColor
+		load15color = valueWarningColor
 	}
 
 	if load1 >= criticalThreshold*cores {
-		load1color = keyValueCriticalColor
+		load1color = valueCriticalColor
 	}
 	if load5 >= criticalThreshold*cores {
-		load5color = keyValueCriticalColor
+		load5color = valueCriticalColor
 	}
 	if load15 >= criticalThreshold*cores {
-		load15color = keyValueCriticalColor
+		load15color = valueCriticalColor
 	}
 
 	// text format like: 0.12, 0.4, 0.5 (1 / 5 / 15), with colors
 	return Row{
-		singleColorLabelText("Load"),
+		singleColorLabel("Load"),
 		toColorText(
 			ColorString{load1color, fmt.Sprintf("%.2f", load1)},
-			value(" / "),
+			valueDescription(" / "),
 			ColorString{load5color, fmt.Sprintf("%.2f", load5)},
-			value(" / "),
+			valueDescription(" / "),
 			ColorString{load15color, fmt.Sprintf("%.2f", load15)},
-			value(" (1 / 5 / 15)"),
+			valueDescription(" (1 / 5 / 15)"),
 		),
 	}
 }

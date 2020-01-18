@@ -18,7 +18,11 @@ func cores() Row {
 	mhz := int(cpuStat[0].Mhz)
 
 	return Row{
-		singleColorLabelText("Core(s)"),
-		singleColorValueText(fmt.Sprintf("%d core(s) at %d MHz", cores, mhz)),
+		singleColorLabel("Core(s)"),
+		toColorText(
+			valueNeutral(fmt.Sprintf("%d", cores)),
+			valueDescription(" core(s) at "),
+			valueNeutral(fmt.Sprintf("%d MHz", mhz)),
+		),
 	}
 }
