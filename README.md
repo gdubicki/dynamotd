@@ -14,6 +14,11 @@ it, then something IS wrong with the server, isn't it?).
 * **Useful default info** - CPU Load, Memory use, Network use, Disk space use etc.,
 * **Semantic colors** - for example red if load is higher than no of cores,
 * **Customizable** - reorder and remove default lines,
+
+## TODO
+
+These features are planned to be implemented:
+
 * **Pluggable** - add custom lines with any label and any command(s) output as the value,
 * **Static and dynamic mode** - the former just prints the current state, the latter updates every 2 seconds,
   like htop,
@@ -21,15 +26,6 @@ it, then something IS wrong with the server, isn't it?).
 * **Fast** - written in Go for that,
 * **Circuit-breaker** - minimal info mode in case of server overload detection,
 * **Native packages for Centos and Ubuntu** - so you can easily install it on (almost) all of your servers.
-
-## Status
-
-POC.
-
-TODO: Almost all of the above. :P
-
-We have some default info, limited customizability, semantic colors, static and dynamic mode (although the latter is
-not really dynamic yet).
 
 We also don't have tests and the building pipeline (but they WILL be created if we decide to go ahead with the project).
 
