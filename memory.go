@@ -16,24 +16,24 @@ func memory() Row {
 		panic(fmt.Errorf("error getting memory info"))
 	}
 	memoryTotalBytes := float64(memoryStat.Total)
-	memoryFreeBytes := float64(memoryStat.Free)
+	memoryAvailableBytes := float64(memoryStat.Total) - float64(memoryStat.Used)
 
-	if memoryFreeBytes <= criticalThreshold*memoryTotalBytes {
+	if memoryAvailableBytes <= criticalThreshold * memoryTotalBytes {
 		color = valueCriticalColor
-	} else if memoryFreeBytes <= warningThreshold*memoryTotalBytes {
+	} else if memoryAvailableBytes <= warningThreshold * memoryTotalBytes {
 		color = valueWarningColor
 	} else {
 		color = valueOkColor
 	}
 
 	memoryTotalGB := memoryTotalBytes / 1024 / 1024 / 1024
-	memoryFreeGB := memoryFreeBytes / 1024 / 1024 / 1024
+	memoryAvailableGB := memoryAvailableBytes / 1024 / 1024 / 1024
 
 	return Row{
 		singleColorLabel("Memory"),
 		toColorText(
-			ColorString{color, fmt.Sprintf("%.2f GB", memoryFreeGB)},
-			valueDescription(" (free) / "),
+			ColorString{color, fmt.Sprintf("%.2f GB", memoryAvailableGB)},
+			valueDescription(" (available) / "),
 			valueNeutral(fmt.Sprintf("%.2f GB", memoryTotalGB)),
 			valueDescription(" (total)"),
 		),
