@@ -23,12 +23,22 @@ func getUptimeColorAndString() (Color, string) {
 
 	uptime,_ := host.Uptime()
 
-	years := uptime / (60 * 60 * 24 * 365)
-	months := uptime / (60 * 60 * 24 * 30)
-	days := uptime / (60 * 60 * 24)
-	hours := (uptime - (days * 60 * 60 * 24)) / (60 * 60)
-	minutes := ((uptime - (days * 60 * 60 * 24))  -  (hours * 60 * 60)) / 60
+	var secondsInAYear uint64 = 60 * 60 * 24 * 365
+	years := uptime / secondsInAYear
 
+	var secondsInAMonth uint64 = 60 * 60 * 24 * 30
+	months := (uptime - (years * secondsInAYear)) / secondsInAMonth
+
+	var secondsInADay uint64 = 60 * 60 * 24
+	days := (uptime - (years * secondsInAYear) - (months * secondsInAMonth)) / secondsInADay
+
+	var secondsInAnHour uint64 = 60 * 60
+	hours := (uptime - (years * secondsInAYear) - (months * secondsInAMonth) - (days * secondsInADay)) / secondsInAnHour
+
+	var secondsInAMinute uint64 = 60
+	minutes := (uptime - (years * secondsInAYear) - (months * secondsInAMonth) - (days * secondsInADay) - (hours * secondsInAnHour)) / secondsInAMinute
+
+	// TODO: make this configurable
 	if years >= 1 {
 		color = valueCriticalColor
 	} else if months >= 1 {
