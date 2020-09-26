@@ -54,7 +54,7 @@ func getLocalIP() string {
 	return localAddr.IP.String()
 }
 
-var showFakeIP = true
+var showFakeIP = false
 
 func getExternalIP() string {
 	if showFakeIP {
