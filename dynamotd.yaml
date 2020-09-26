@@ -1,4 +1,8 @@
-mode: static
+# This is a configuration file example.
+# It is completely optional.
+# You can check the defaults in `dynamotd/config.go`
+
+#mode: static
 
 #rows:
 #  - timestamp

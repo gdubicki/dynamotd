@@ -1,6 +1,7 @@
-package main
+package plugins
 
 import (
+	. "github.com/gdubicki/dynamotd/dynamotd"
 	"fmt"
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"log"
@@ -10,7 +11,7 @@ import (
 	"strconv"
 )
 
-func load() Row {
+func Load() Row {
 	// TODO: make below configurable
 	var warningThreshold = 0.9
 	var criticalThreshold = 1.1
@@ -23,9 +24,9 @@ func load() Row {
 
 		stat, err := linuxproc.ReadLoadAvg("/proc/stat")
 		if err != nil {
-			return Row{
-				singleColorLabel("Load"),
-				singleColorValue("Can't read /proc/stat"),
+			return Row {
+				Label: SingleColorLabel("Load"),
+				Value: SingleColorValue("Can't read /proc/stat"),
 			}
 		}
 
@@ -53,40 +54,40 @@ func load() Row {
 		}
 	}
 
-	load1color := valueOkColor
-	load5color := valueOkColor
-	load15color := valueOkColor
+	load1color := ValueOkColor
+	load5color := ValueOkColor
+	load15color := ValueOkColor
 
 	if load1 >= warningThreshold*cores {
-		load1color = valueWarningColor
+		load1color = ValueWarningColor
 	}
 	if load5 >= warningThreshold*cores {
-		load5color = valueWarningColor
+		load5color = ValueWarningColor
 	}
 	if load15 >= warningThreshold*cores {
-		load15color = valueWarningColor
+		load15color = ValueWarningColor
 	}
 
 	if load1 >= criticalThreshold*cores {
-		load1color = valueCriticalColor
+		load1color = ValueCriticalColor
 	}
 	if load5 >= criticalThreshold*cores {
-		load5color = valueCriticalColor
+		load5color = ValueCriticalColor
 	}
 	if load15 >= criticalThreshold*cores {
-		load15color = valueCriticalColor
+		load15color = ValueCriticalColor
 	}
 
 	// text format like: 0.12, 0.4, 0.5 (1 / 5 / 15), with colors
 	return Row{
-		singleColorLabel("Load"),
-		toColorText(
-			ColorString{load1color, fmt.Sprintf("%.2f", load1)},
-			valueDescription(" / "),
-			ColorString{load5color, fmt.Sprintf("%.2f", load5)},
-			valueDescription(" / "),
-			ColorString{load15color, fmt.Sprintf("%.2f", load15)},
-			valueDescription(" (1 / 5 / 15)"),
+		SingleColorLabel("Load"),
+		ToColorText(
+			ColorString{Color: load1color, Text: fmt.Sprintf("%.2f", load1)},
+			ValueDescription(" / "),
+			ColorString{Color: load5color, Text: fmt.Sprintf("%.2f", load5)},
+			ValueDescription(" / "),
+			ColorString{Color: load15color, Text: fmt.Sprintf("%.2f", load15)},
+			ValueDescription(" (1 / 5 / 15)"),
 		),
 	}
 }

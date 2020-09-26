@@ -1,19 +1,20 @@
-package main
+package plugins
 
 import (
+	. "github.com/gdubicki/dynamotd/dynamotd"
 	"fmt"
 	"github.com/shirou/gopsutil/host"
 )
 
 
-func uptime() Row {
+func Uptime() Row {
 
 	color, uptimeString := getUptimeColorAndString()
 
-	return Row{
-		singleColorLabel("Uptime"),
-		toColorText(
-			ColorString{color, uptimeString},
+	return Row {
+		Label: SingleColorLabel("Uptime"),
+		Value: ToColorText(
+			ColorString{Color: color, Text: uptimeString},
 		),
 	}
 }
@@ -40,11 +41,11 @@ func getUptimeColorAndString() (Color, string) {
 
 	// TODO: make this configurable
 	if years >= 1 {
-		color = valueCriticalColor
+		color = ValueCriticalColor
 	} else if months >= 1 {
-		color = valueWarningColor
+		color = ValueWarningColor
 	} else {
-		color = valueOkColor
+		color = ValueOkColor
 	}
 
 	uptimeString := ""

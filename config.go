@@ -2,6 +2,8 @@ package main
 
 
 import (
+	. "github.com/gdubicki/dynamotd/dynamotd"
+	. "github.com/gdubicki/dynamotd/plugins"
 	"fmt"
 	"github.com/spf13/viper"
 )
@@ -10,15 +12,15 @@ var MaxRows = 40
 
 var config = viper.New()
 
-func configure() {
+func init() {
 	config.SetDefault("mode", "static")
 	config.SetDefault("rows", []string{
 		"timestamp",
-		"emptyLine",
+		"",
 		"fqdn",
 		"ip",
 		"uptime",
-		"emptyLine",
+		"",
 		"cores",
 		"load",
 		"memory",
@@ -39,12 +41,12 @@ func configure() {
 	}
 }
 
-func isModeStatic() bool {
+func IsModeStatic() bool {
 	mode := config.GetString("mode")
 	return mode == "static"
 }
 
-func getRows() []Row {
+func GetRows() []Row {
 	var rows []Row
 
 	rowsStrings := config.GetStringSlice("rows")
@@ -61,22 +63,22 @@ func getRows() []Row {
 
 		// TODO: consider using reflection to be able to add row types without editing this file
 		switch rowString {
-		case "emptyLine":
-			rows = append(rows, emptyLine())
+		case "","emptyLine":
+			rows = append(rows, EmptyLine())
 		case "timestamp":
-			rows = append(rows, timestamp())
+			rows = append(rows, Timestamp())
 		case "fqdn":
-			rows = append(rows, fqdn())
+			rows = append(rows, Fqdn())
 		case "load":
-			rows = append(rows, load())
+			rows = append(rows, Load())
 		case "ip":
-			rows = append(rows, ip())
+			rows = append(rows, Ip())
 		case "uptime":
-			rows = append(rows, uptime())
+			rows = append(rows, Uptime())
 		case "cores":
-			rows = append(rows, cores())
+			rows = append(rows, Cores())
 		case "memory":
-			rows = append(rows, memory())
+			rows = append(rows, Memory())
 		default:
 			panic(fmt.Errorf("error while generating row from string '%s' - check for typos", rowString))
 		}

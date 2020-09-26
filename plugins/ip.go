@@ -1,6 +1,7 @@
-package main
+package plugins
 
 import (
+	. "github.com/gdubicki/dynamotd/dynamotd"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -8,31 +9,31 @@ import (
 )
 
 
-func ip() Row {
+func Ip() Row {
 	localIP := getLocalIP()
 	externalIP := getExternalIP()
 
 	var localIPcolor, externalIPcolor Color
 
 	if strings.Contains(localIP, "can't") {
-		localIPcolor = valueCriticalColor
+		localIPcolor = ValueCriticalColor
 	} else {
-		localIPcolor = valueNeutralColor
+		localIPcolor = ValueNeutralColor
 	}
 
 	if strings.Contains(externalIP, "can't") {
-		externalIPcolor = valueCriticalColor
+		externalIPcolor = ValueCriticalColor
 	} else {
-		externalIPcolor = valueNeutralColor
+		externalIPcolor = ValueNeutralColor
 	}
 
-	return Row{
-		singleColorLabel("IP"),
-		toColorText(
-			ColorString{localIPcolor, localIP},
-			valueDescription(" (external: "),
-			ColorString{externalIPcolor, externalIP},
-			valueDescription(")"),
+	return Row {
+		Label: SingleColorLabel("IP"),
+		Value: ToColorText(
+			ColorString{Color: localIPcolor, Text: localIP},
+			ValueDescription(" (external: "),
+			ColorString{Color: externalIPcolor, Text: externalIP},
+			ValueDescription(")"),
 		),
 	}
 }

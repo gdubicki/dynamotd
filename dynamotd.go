@@ -1,15 +1,15 @@
 package main
 
-func init() {
-	configure()
-}
+import (
+	. "github.com/gdubicki/dynamotd/dynamotd"
+)
 
 func main() {
-	rows := getRows()
+	rows := GetRows()
 
-	if isModeStatic() {
-		printStatic(rows)
+	if IsModeStatic() {
+		PrintStatic(rows)
 	} else {
-		showDynamic(rows)
+		ShowDynamic(rows)
 	}
 }
