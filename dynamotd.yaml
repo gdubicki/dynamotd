@@ -3,6 +3,8 @@
 
 mode: static
 
+example_data: true
+
 rows:
   - "timestamp"
   - ""

@@ -54,18 +54,24 @@ func getLocalIP() string {
 	return localAddr.IP.String()
 }
 
+var showFakeIP = true
+
 func getExternalIP() string {
-	client := http.Client{
-		Timeout: 3 * time.Second,
+	if showFakeIP {
+		return "123.123.123.123"
+	} else {
+		client := http.Client{
+			Timeout: 3 * time.Second,
+		}
+		resp, err := client.Get("https://icanhazip.com")
+		if err != nil {
+			return "can't get / too slow internet connection!"
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return "can't get - check internet connection!"
+		}
+		return strings.TrimSpace(string(body))
 	}
-	resp, err := client.Get("https://icanhazip.com")
-	if err != nil {
-		return "can't get / too slow internet connection!"
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "can't get - check internet connection!"
-	}
-	return strings.TrimSpace(string(body))
 }
