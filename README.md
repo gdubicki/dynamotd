@@ -41,5 +41,5 @@ Requirements:
 
 How-to build:
 ```
-go build ./...
+./build.sh
 ```
