@@ -41,7 +41,7 @@ func getUptimeColorAndString() (Color, string) {
 	// TODO: make this configurable
 	if years >= 1 {
 		color = ValueCriticalColor
-	} else if months >= 1 {
+	} else if months >= 3 {
 		color = ValueWarningColor
 	} else {
 		color = ValueOkColor
