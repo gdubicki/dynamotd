@@ -3,12 +3,13 @@ package plugins
 import (
 	"fmt"
 	. "github.com/gdubicki/dynamotd/dynamotd"
+	humanize "github.com/dustin/go-humanize"
 	memoryLib "github.com/mackerelio/go-osstat/memory"
 )
 
 func Memory() Row {
-	var warningThreshold = 0.1
-	var criticalThreshold = 0.05
+	var warningThreshold = 90.0
+	var criticalThreshold = 95.0
 
 	var color Color
 
@@ -16,27 +17,28 @@ func Memory() Row {
 	if err != nil {
 		panic(fmt.Errorf("error getting memory info"))
 	}
-	memoryTotalBytes := float64(memoryStat.Total)
-	memoryAvailableBytes := float64(memoryStat.Total) - float64(memoryStat.Used)
+	memoryTotalBytes := memoryStat.Total
+	memoryUsedBytes := memoryStat.Used
 
-	if memoryAvailableBytes <= criticalThreshold*memoryTotalBytes {
+	percentage := float64(memoryUsedBytes) / float64(memoryTotalBytes) * 100
+
+	if percentage >= criticalThreshold {
 		color = ValueCriticalColor
-	} else if memoryAvailableBytes <= warningThreshold*memoryTotalBytes {
+	} else if percentage >= warningThreshold {
 		color = ValueWarningColor
 	} else {
 		color = ValueOkColor
 	}
 
-	memoryTotalGB := memoryTotalBytes / 1024 / 1024 / 1024
-	memoryAvailableGB := memoryAvailableBytes / 1024 / 1024 / 1024
-
 	return Row{
 		Label: SingleColorLabel("Memory"),
 		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%.2f GB", memoryAvailableGB)},
-			ValueDescription(" (available) / "),
-			ValueNeutral(fmt.Sprintf("%.2f GB", memoryTotalGB)),
-			ValueDescription(" (total)"),
+			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.Bytes(memoryUsedBytes))},
+			ValueDescription(" of "),
+			ValueNeutral(fmt.Sprintf("%s", humanize.Bytes(memoryTotalBytes))),
+			ValueDescription(" RAM used ("),
+			ColorString{Color: color, Text: fmt.Sprintf("%0.2f%%", percentage)},
+			ValueDescription(")"),
 		),
 	}
 }

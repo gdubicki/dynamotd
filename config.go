@@ -20,7 +20,6 @@ func init() {
 		"ip",
 		"uptime",
 		"",
-		"cores",
 		"load",
 		"memory",
 		"diskspace",

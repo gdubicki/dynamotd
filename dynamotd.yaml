@@ -10,7 +10,6 @@ rows:
   - "ip"
   - "uptime"
   - ""
-  - "cores"
   - "load"
   - "memory"
   - "diskspace"

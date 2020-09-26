@@ -26,7 +26,8 @@ func printStaticRow(row Row) {
 			valueToPrint += getStringToPrint(colorString)
 		}
 
-		fmt.Printf("%-20s : %s\n", labelToPrint, valueToPrint)
+		// TODO: make the width of label column dynamic
+		fmt.Printf("%-23s : %s\n", labelToPrint, valueToPrint)
 	}
 }
 

@@ -22,23 +22,24 @@ func ShowDynamic(rows []Row) {
 }
 
 func showDynamicRow(row Row, textView *tview.TextView) {
+	panic(fmt.Errorf("dynamic mode not implemented yet"))
 
-	if row.isEmptyLine() {
-		fmt.Fprintf(textView, "\n")
-	} else {
-		labelToShow := ""
-		valueToShow := ""
-
-		for _, colorString := range row.Label.text {
-			labelToShow += getStringToShow(colorString)
-		}
-
-		for _, colorString := range row.Value.text {
-			valueToShow += getStringToShow(colorString)
-		}
-
-		fmt.Fprintf(textView, "%-20s : %s\n", labelToShow, valueToShow)
-	}
+	//if row.isEmptyLine() {
+	//	fmt.Fprintf(textView, "\n")
+	//} else {
+	//	labelToShow := ""
+	//	valueToShow := ""
+	//
+	//	for _, colorString := range row.Label.text {
+	//		labelToShow += getStringToShow(colorString)
+	//	}
+	//
+	//	for _, colorString := range row.Value.text {
+	//		valueToShow += getStringToShow(colorString)
+	//	}
+	//
+	//	fmt.Fprintf(textView, "%-20s : %s\n", labelToShow, valueToShow)
+	//}
 }
 
 func getStringToShow(colorString ColorString) string {

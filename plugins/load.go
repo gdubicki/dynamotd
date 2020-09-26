@@ -3,6 +3,7 @@ package plugins
 import (
 	"fmt"
 	. "github.com/gdubicki/dynamotd/dynamotd"
+	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/load"
 	"runtime"
 )
@@ -47,16 +48,24 @@ func Load() Row {
 		load15color = ValueWarningColor
 	}
 
-	// text format like: 0.12, 0.4, 0.5 (1 / 5 / 15), with colors
+	cpuStat, err := cpu.Info()
+	if err != nil {
+		panic(fmt.Errorf("error getting CPU info"))
+	}
+	mhz := int(cpuStat[0].Mhz)
+
 	return Row{
-		Label: SingleColorLabel("Load"),
+		Label: SingleColorLabel("Load (1/5/15)"),
 		Value: ToColorText(
 			ColorString{Color: load1color, Text: fmt.Sprintf("%.2f", load1)},
 			ValueDescription(" / "),
 			ColorString{Color: load5color, Text: fmt.Sprintf("%.2f", load5)},
 			ValueDescription(" / "),
 			ColorString{Color: load15color, Text: fmt.Sprintf("%.2f", load15)},
-			ValueDescription(" (1 / 5 / 15)"),
+			ValueDescription(" with "),
+			ValueNeutral(fmt.Sprintf("%d", int(cores))),
+			ValueDescription(" core(s) at "),
+			ValueNeutral(fmt.Sprintf("%d MHz", mhz)),
 		),
 	}
 }
