@@ -3,8 +3,8 @@ package plugins
 import (
 	"fmt"
 	. "github.com/gdubicki/dynamotd/dynamotd"
-	humanize "github.com/dustin/go-humanize"
 	memoryLib "github.com/mackerelio/go-osstat/memory"
+	"github.com/Tonyfilla/go-humanize"
 )
 
 func Memory() Row {
@@ -33,9 +33,9 @@ func Memory() Row {
 	return Row{
 		Label: SingleColorLabel("Memory"),
 		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.Bytes(memoryUsedBytes))},
+			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.BytesCustomCeil(memoryUsedBytes, 2))},
 			ValueDescription(" of "),
-			ValueNeutral(fmt.Sprintf("%s", humanize.Bytes(memoryTotalBytes))),
+			ValueNeutral(fmt.Sprintf("%s", humanize.BytesCustomFloor(memoryTotalBytes, 2))),
 			ValueDescription(" RAM used ("),
 			ColorString{Color: color, Text: fmt.Sprintf("%0.2f%%", percentage)},
 			ValueDescription(")"),

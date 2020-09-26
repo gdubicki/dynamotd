@@ -2,7 +2,7 @@ package plugins
 
 import (
 	"fmt"
-	humanize "github.com/dustin/go-humanize"
+	"github.com/Tonyfilla/go-humanize"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/minio/minio/pkg/disk"
 )
@@ -31,9 +31,9 @@ func DiskSpace(path string) Row {
 	return Row{
 		Label: SingleColorLabel("Disk space (/)"),
 		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.Bytes(di.Total-di.Free))},
+			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.BytesCustomCeil(di.Total-di.Free, 2))},
 			ValueDescription(" of "),
-			ValueNeutral(fmt.Sprintf("%s", humanize.Bytes(di.Total))),
+			ValueNeutral(fmt.Sprintf("%s", humanize.BytesCustomFloor(di.Total, 2))),
 			ValueDescription(" disk space used ("),
 			ColorString{Color: color, Text: fmt.Sprintf("%0.2f%%", percentageUsed)},
 			ValueDescription(")"),
