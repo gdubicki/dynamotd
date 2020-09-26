@@ -1,10 +1,16 @@
 # This is a configuration file example.
-# It is completely optional.
-# You can check the defaults in `dynamotd/config.go`
+# It is completely optional. The values below represent the defaults.
 
-#mode: static
+mode: static
 
-#rows:
-#  - timestamp
-#  - emptyLine
-#  - foo
+rows:
+  - "timestamp"
+  - ""
+  - "fqdn"
+  - "ip"
+  - "uptime"
+  - ""
+  - "cores"
+  - "load"
+  - "memory"
+  - "diskspace"

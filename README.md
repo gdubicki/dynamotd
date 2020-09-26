@@ -15,6 +15,16 @@ it, then something IS wrong with the server, isn't it?).
 * **Semantic colors** - for example red if load is higher than number of cores,
 * **Customizable** - reorder and remove default lines,
 
+## How-to
+
+Add it to your system as a dynamic MOTD by following these great guides:
+* [Ubuntu/Debian](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/), 
+* (TODO: add RedHat/Centos and more)
+
+Optionally configure with `dynamotd.yaml` file in the current dir, `~/.dynamotd/` or `/etc/`.
+
+See the example config in [dynamotd.yaml](./dynamotd.yaml).
+
 ## TODO
 
 These features will be implemented in the future:
