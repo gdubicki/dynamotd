@@ -37,10 +37,9 @@ What we DO have is some non-idiomatic code and brain-dead solutions because the 
 ## Building
 
 Requirements:
-* Go v. ? (I am using 1.13),
-* ?
+* Go v. 1.13+
 
 How-to build:
 ```
-go build
+go build ./...
 ```
