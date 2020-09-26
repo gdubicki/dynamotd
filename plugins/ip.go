@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func Ip() Row {
@@ -54,9 +55,12 @@ func getLocalIP() string {
 }
 
 func getExternalIP() string {
-	resp, err := http.Get("https://icanhazip.com")
+	client := http.Client{
+		Timeout: 3 * time.Second,
+	}
+	resp, err := client.Get("https://icanhazip.com")
 	if err != nil {
-		return "can't get - check internet connection!"
+		return "can't get / too slow internet connection!"
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
