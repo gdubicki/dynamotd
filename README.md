@@ -11,13 +11,15 @@ it, then something IS wrong with the server, isn't it?).
 
 ![Dynamotd](dynamotd.png)
 
-* **Useful default info** - CPU Load, Memory use, Network use, Disk space use etc.,
+* **Useful default info** - CPU Load, Memory use, Disk space use etc.,
 * **Semantic colors** - for example red if load is higher than number of cores,
 * **Customizable** - reorder and remove default lines,
 
 ## How-to
 
-Add it to your system as a dynamic MOTD by following these great guides:
+Download the single binary from released.
+
+Add it to your system as a dynamic MOTD by following one of these great guides:
 * [Ubuntu/Debian](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/), 
 * (TODO: add RedHat/Centos and more)
 
