@@ -23,6 +23,7 @@ func init() {
 		"cores",
 		"load",
 		"memory",
+		"diskspace",
 	})
 
 	config.SetConfigName("dynamotd.yaml")
@@ -78,6 +79,8 @@ func GetRows() []Row {
 			rows = append(rows, Cores())
 		case "memory":
 			rows = append(rows, Memory())
+		case "diskspace":
+			rows = append(rows, DiskSpace("/"))
 		default:
 			panic(fmt.Errorf("error while generating row from string '%s' - check for typos", rowString))
 		}
