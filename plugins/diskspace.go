@@ -31,9 +31,9 @@ func DiskSpace(path string) Row {
 	return Row{
 		Label: SingleColorLabel("Disk space (/)"),
 		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.BytesCustomCeil(di.Total-di.Free, 2))},
+			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(di.Total-di.Free, 2))},
 			ValueDescription(" of "),
-			ValueNeutral(fmt.Sprintf("%s", humanize.BytesCustomFloor(di.Total, 2))),
+			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(di.Total, 0))),
 			ValueDescription(" disk space used ("),
 			ColorString{Color: color, Text: fmt.Sprintf("%0.2f%%", percentageUsed)},
 			ValueDescription(")"),
