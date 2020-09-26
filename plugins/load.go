@@ -1,9 +1,9 @@
 package plugins
 
 import (
-	. "github.com/gdubicki/dynamotd/dynamotd"
 	"fmt"
 	linuxproc "github.com/c9s/goprocinfo/linux"
+	. "github.com/gdubicki/dynamotd/dynamotd"
 	"log"
 	"os/exec"
 	"regexp"
@@ -24,7 +24,7 @@ func Load() Row {
 
 		stat, err := linuxproc.ReadLoadAvg("/proc/stat")
 		if err != nil {
-			return Row {
+			return Row{
 				Label: SingleColorLabel("Load"),
 				Value: SingleColorValue("Can't read /proc/stat"),
 			}
@@ -80,8 +80,8 @@ func Load() Row {
 
 	// text format like: 0.12, 0.4, 0.5 (1 / 5 / 15), with colors
 	return Row{
-		SingleColorLabel("Load"),
-		ToColorText(
+		Label: SingleColorLabel("Load"),
+		Value: ToColorText(
 			ColorString{Color: load1color, Text: fmt.Sprintf("%.2f", load1)},
 			ValueDescription(" / "),
 			ColorString{Color: load5color, Text: fmt.Sprintf("%.2f", load5)},

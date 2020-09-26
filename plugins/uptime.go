@@ -1,17 +1,16 @@
 package plugins
 
 import (
-	. "github.com/gdubicki/dynamotd/dynamotd"
 	"fmt"
+	. "github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/shirou/gopsutil/host"
 )
-
 
 func Uptime() Row {
 
 	color, uptimeString := getUptimeColorAndString()
 
-	return Row {
+	return Row{
 		Label: SingleColorLabel("Uptime"),
 		Value: ToColorText(
 			ColorString{Color: color, Text: uptimeString},
@@ -22,7 +21,7 @@ func Uptime() Row {
 func getUptimeColorAndString() (Color, string) {
 	var color Color
 
-	uptime,_ := host.Uptime()
+	uptime, _ := host.Uptime()
 
 	var secondsInAYear uint64 = 60 * 60 * 24 * 365
 	years := uptime / secondsInAYear

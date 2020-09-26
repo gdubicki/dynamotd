@@ -1,8 +1,8 @@
 package plugins
 
 import (
-	. "github.com/gdubicki/dynamotd/dynamotd"
 	"fmt"
+	. "github.com/gdubicki/dynamotd/dynamotd"
 	memoryLib "github.com/mackerelio/go-osstat/memory"
 )
 
@@ -19,9 +19,9 @@ func Memory() Row {
 	memoryTotalBytes := float64(memoryStat.Total)
 	memoryAvailableBytes := float64(memoryStat.Total) - float64(memoryStat.Used)
 
-	if memoryAvailableBytes <= criticalThreshold * memoryTotalBytes {
+	if memoryAvailableBytes <= criticalThreshold*memoryTotalBytes {
 		color = ValueCriticalColor
-	} else if memoryAvailableBytes <= warningThreshold * memoryTotalBytes {
+	} else if memoryAvailableBytes <= warningThreshold*memoryTotalBytes {
 		color = ValueWarningColor
 	} else {
 		color = ValueOkColor
@@ -30,7 +30,7 @@ func Memory() Row {
 	memoryTotalGB := memoryTotalBytes / 1024 / 1024 / 1024
 	memoryAvailableGB := memoryAvailableBytes / 1024 / 1024 / 1024
 
-	return Row {
+	return Row{
 		Label: SingleColorLabel("Memory"),
 		Value: ToColorText(
 			ColorString{Color: color, Text: fmt.Sprintf("%.2f GB", memoryAvailableGB)},

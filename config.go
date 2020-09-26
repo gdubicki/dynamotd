@@ -1,10 +1,9 @@
 package main
 
-
 import (
+	"fmt"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	. "github.com/gdubicki/dynamotd/plugins"
-	"fmt"
 	"github.com/spf13/viper"
 )
 
@@ -63,7 +62,7 @@ func GetRows() []Row {
 
 		// TODO: consider using reflection to be able to add row types without editing this file
 		switch rowString {
-		case "","emptyLine":
+		case "", "emptyLine":
 			rows = append(rows, EmptyLine())
 		case "timestamp":
 			rows = append(rows, Timestamp())

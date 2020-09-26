@@ -7,7 +7,6 @@ import (
 	"runtime"
 )
 
-
 func Cores() Row {
 
 	cores := runtime.NumCPU()
@@ -19,8 +18,8 @@ func Cores() Row {
 	mhz := int(cpuStat[0].Mhz)
 
 	return Row{
-		SingleColorLabel("Core(s)"),
-		ToColorText(
+		Label: SingleColorLabel("Core(s)"),
+		Value: ToColorText(
 			ValueNeutral(fmt.Sprintf("%d", cores)),
 			ValueDescription(" core(s) at "),
 			ValueNeutral(fmt.Sprintf("%d MHz", mhz)),

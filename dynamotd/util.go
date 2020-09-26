@@ -15,11 +15,11 @@ type ColorText struct {
 
 type ColorString struct {
 	Color Color
-	Text string
+	Text  string
 }
 
 type Color struct {
-	staticColor color.Attribute
+	staticColor  color.Attribute
 	dynamicColor string
 }
 
@@ -31,11 +31,11 @@ var ValueWarningColor = Color{color.FgYellow, "lightgoldenrodyellow"}
 var ValueCriticalColor = Color{color.FgRed, "indianred"}
 
 func ValueDescription(text string) ColorString {
-	return  ColorString{ValueDescriptionColor, text}
+	return ColorString{ValueDescriptionColor, text}
 }
 
 func ValueNeutral(text string) ColorString {
-	return  ColorString{ValueNeutralColor, text}
+	return ColorString{ValueNeutralColor, text}
 }
 
 func ValueOk(text string) ColorString {

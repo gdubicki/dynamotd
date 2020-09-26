@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-
 func Ip() Row {
 	localIP := getLocalIP()
 	externalIP := getExternalIP()
@@ -27,7 +26,7 @@ func Ip() Row {
 		externalIPcolor = ValueNeutralColor
 	}
 
-	return Row {
+	return Row{
 		Label: SingleColorLabel("IP"),
 		Value: ToColorText(
 			ColorString{Color: localIPcolor, Text: localIP},
