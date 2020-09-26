@@ -71,11 +71,5 @@ func ToColorText(colorStrings ...ColorString) ColorText {
 }
 
 func (row Row) isEmptyLine() bool {
-	labelText := row.Label.text
-	valueText := row.Value.text
-
-	labelIsEmpty := len(labelText) == 1 && labelText[0].Text == ""
-	valueIsEmpty := len(valueText) == 1 && valueText[0].Text == ""
-
-	return labelIsEmpty && valueIsEmpty
+	return len(row.Label.text) == 0 && len(row.Value.text) == 0
 }

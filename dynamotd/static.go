@@ -12,7 +12,6 @@ func PrintStatic(rows []Row) {
 }
 
 func printStaticRow(row Row) {
-
 	if row.isEmptyLine() {
 		fmt.Print("\n")
 	} else {

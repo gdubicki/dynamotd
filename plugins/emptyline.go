@@ -5,8 +5,5 @@ import (
 )
 
 func EmptyLine() Row {
-	return Row{
-		Label: SingleColorLabel(""),
-		Value: SingleColorValue(""),
-	}
+	return *new(Row)
 }
