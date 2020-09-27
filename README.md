@@ -17,7 +17,7 @@ it, then something IS wrong with the server, isn't it?).
 
 ## How-to
 
-Download the single binary from released.
+Download the single binary from the releases.
 
 Add it to your system as a dynamic MOTD by following one of these great guides:
 * [Ubuntu/Debian](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/), 
