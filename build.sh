@@ -1,5 +1,5 @@
 #!/bin/bash
 
-for os in linux darwin ; do
-  GOOS=$os GOARCH=amd64 go build -o dynamotd-$os-amd64
-done
+GOOS=linux GOARCH=amd64 go build -o dynamotd-linux-amd64
+GOOS=linux GOARCH=arm64 go build -o dynamotd-linux-arm64
+GOOS=darwin GOARCH=amd64 go build -o dynamotd-macos

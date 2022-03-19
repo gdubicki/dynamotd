@@ -49,7 +49,7 @@ What we DO have is some non-idiomatic code and brain-dead solutions because the 
 ## Building
 
 Requirements:
-* Go v. 1.13+
+* Go v. 1.17+
 
 How-to build:
 ```
