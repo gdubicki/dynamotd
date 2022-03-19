@@ -2,9 +2,9 @@ package plugins
 
 import (
 	"fmt"
+	"github.com/Tonyfilla/go-humanize"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	memoryLib "github.com/mackerelio/go-osstat/memory"
-	"github.com/Tonyfilla/go-humanize"
 )
 
 func Memory() Row {

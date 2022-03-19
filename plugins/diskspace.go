@@ -18,7 +18,7 @@ func DiskSpace(path string) Row {
 		panic(fmt.Errorf("error getting disk info"))
 	}
 
-	percentageUsed := (float64(di.Total-di.Free)/float64(di.Total))*100
+	percentageUsed := (float64(di.Total-di.Free) / float64(di.Total)) * 100
 
 	if percentageUsed >= warningThreshold {
 		color = ValueCriticalColor
