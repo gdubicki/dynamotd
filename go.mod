@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/Showmax/go-fqdn v0.0.0-20180501083314-6f60894d629f
 	github.com/Tonyfilla/go-humanize v0.0.0-20190109114339-dd7dcc22b778
-	github.com/fatih/color v1.7.0
+	github.com/fatih/color v1.13.0
 	github.com/mackerelio/go-osstat v0.2.1
 	github.com/minio/minio v0.0.0-20200926040242-511424a287e7
 	github.com/rivo/tview v0.0.0-20191129065140-82b05c9fb329
@@ -22,8 +22,8 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.2 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
-	github.com/mattn/go-colorable v0.1.4 // indirect
-	github.com/mattn/go-isatty v0.0.11 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/montanaflynn/stats v0.5.0 // indirect

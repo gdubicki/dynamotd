@@ -11,40 +11,24 @@ it, then something IS wrong with the server, isn't it?).
 
 ![Dynamotd](dynamotd.png)
 
-* **Useful default info** - CPU Load, Memory use, Disk space use etc.,
-* **Semantic colors** - for example red if load is higher than number of cores,
-* **Customizable** - reorder and remove default lines,
+* **Useful default info** - CPU load, memory use, disk space use etc.,
+* **Semantic colors** - <span style="color:red">red</span> ~ problem, <span style="color:orange">orange</span> ~ warning.
+* **Customizable** - reorder or remove lines,
+* **Fast** - native app,
 
 ## How-to
 
 Download the single binary from the releases.
 
-Add it to your system as a dynamic MOTD by following one of these great guides:
-* [Ubuntu/Debian](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/), 
-* (TODO: add RedHat/Centos and more)
-
 Optionally configure with `dynamotd.yaml` file in the current dir, `~/.dynamotd/` or `/etc/`.
-
 See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
-## TODO
+Check out the available command-line arguments by running `dynamotd -help`.
 
-These features will be implemented in the future:
 
-* **Pluggable** - add custom lines with any label and any command(s) output as the value,
-* **Static and dynamic mode** - the former just prints the current state, the latter updates every 2 seconds,
-  like htop,
-* **Keyboard shortcuts** - to run popular tools (in dynamic mode only) like htop, iftop etc.
-* **Fast** - written in Go for that,
-* **Circuit-breaker** - minimal info mode in case of server overload detection,
-* **Native packages for Centos and Ubuntu** - so you can easily install it on (almost) all of your servers.
-
-We also don't have the tests yet and the building pipeline (but they WILL be created if we decide to go ahead with the project).
-
-Finally, we don't have user docs, developer docs and contribution guide.
-
-What we DO have is some non-idiomatic code and brain-dead solutions because the original author is only learning Golang.
-:P
+If you like it you can add it to your system as a dynamic MOTD by following one of these great guides:
+* [Ubuntu/Debian](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/),
+* (TODO: add RedHat/Centos and more)
 
 ## Building
 
@@ -55,3 +39,21 @@ How-to build:
 ```
 ./build.sh
 ```
+
+## TODO
+
+These features will be implemented in the future:
+
+* **Pluggable** - add custom lines with any label and any command(s) output as the value,
+* **Static and dynamic mode** - the former just prints the current state, the latter updates every 2 seconds,
+  like htop,
+* **Keyboard shortcuts** - to run popular tools (in dynamic mode only) like htop, iftop etc.
+* **Circuit-breaker** - minimal info mode in case of server overload detection,
+* **Native packages for Centos and Ubuntu** - so you can easily install it on (almost) all of your servers.
+
+We also don't have the tests yet and the building pipeline (but they WILL be created if we decide to go ahead with the project).
+
+Finally, we don't have user docs, developer docs and contribution guide.
+
+What we DO have is some non-idiomatic code and brain-dead solutions because the original author is only learning Golang.
+:P

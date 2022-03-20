@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	"runtime"
 )
@@ -13,8 +15,18 @@ func init() {
 }
 
 func main() {
-	rows := GetRows()
+	var flagForceColor = flag.Bool("force-color", false, "Force color output")
+	var flagNoColor = flag.Bool("no-color", false, "Disable color output")
 
+	flag.Parse()
+
+	if *flagNoColor {
+		color.NoColor = true
+	} else if *flagForceColor {
+		color.NoColor = false
+	}
+
+	rows := GetRows()
 	if IsModeStatic() {
 		PrintStatic(rows)
 	} else {
