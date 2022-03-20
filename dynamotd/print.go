@@ -35,7 +35,12 @@ func getStringToPrint(colorString ColorString) string {
 	// generate function that prints in given color
 	// (https://github.com/fatih/color#insert-into-noncolor-strings-sprintfunc)
 	// TODO: pregenerate (store in struct?) the color printing functions
-	colorPrint := color.New(colorString.Color).SprintFunc()
 
-	return fmt.Sprintf("%s", colorPrint(colorString.Text))
+	// TODO: fix issue #4 in a more elegant way
+	if colorString.Color != color.FgWhite {
+		colorPrint := color.New(colorString.Color).SprintFunc()
+		return fmt.Sprintf("%s", colorPrint(colorString.Text))
+	} else {
+		return fmt.Sprintf(colorString.Text)
+	}
 }
