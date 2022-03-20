@@ -14,21 +14,17 @@ type ColorText struct {
 }
 
 type ColorString struct {
-	Color Color
+	Color color.Attribute
 	Text  string
 }
 
-type Color struct {
-	staticColor  color.Attribute
-	dynamicColor string
-}
+var LabelColor = color.FgWhite
 
-var LabelColor = Color{color.FgWhite, "white"}
-var ValueDescriptionColor = Color{color.FgWhite, "white"}
-var ValueNeutralColor = Color{color.FgBlue, "lightblue"}
-var ValueOkColor = Color{color.FgGreen, "lightgreen"}
-var ValueWarningColor = Color{color.FgYellow, "lightgoldenrodyellow"}
-var ValueCriticalColor = Color{color.FgRed, "indianred"}
+var ValueDescriptionColor = color.FgWhite
+var ValueNeutralColor = color.FgBlue
+var ValueOkColor = color.FgGreen
+var ValueWarningColor = color.FgYellow
+var ValueCriticalColor = color.FgRed
 
 func ValueDescription(text string) ColorString {
 	return ColorString{ValueDescriptionColor, text}

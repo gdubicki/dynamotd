@@ -1,10 +1,6 @@
 # This is a configuration file example.
 # It is completely optional. The values below represent the defaults.
 
-mode: static
-
-example_data: true
-
 rows:
   - "timestamp"
   - ""

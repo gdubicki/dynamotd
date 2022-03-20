@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	"io/ioutil"
 	"net"
@@ -13,7 +14,7 @@ func Ip() Row {
 	localIP := getLocalIP()
 	externalIP := getExternalIP()
 
-	var localIPcolor, externalIPcolor Color
+	var localIPcolor, externalIPcolor color.Attribute
 
 	if strings.Contains(localIP, "can't") {
 		localIPcolor = ValueCriticalColor

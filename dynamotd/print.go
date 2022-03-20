@@ -5,13 +5,13 @@ import (
 	"github.com/fatih/color"
 )
 
-func PrintStatic(rows []Row) {
+func Print(rows []Row) {
 	for _, row := range rows {
-		printStaticRow(row)
+		printRow(row)
 	}
 }
 
-func printStaticRow(row Row) {
+func printRow(row Row) {
 	if row.isEmptyLine() {
 		fmt.Print("\n")
 	} else {
@@ -35,7 +35,7 @@ func getStringToPrint(colorString ColorString) string {
 	// generate function that prints in given color
 	// (https://github.com/fatih/color#insert-into-noncolor-strings-sprintfunc)
 	// TODO: pregenerate (store in struct?) the color printing functions
-	colorPrint := color.New(colorString.Color.staticColor).SprintFunc()
+	colorPrint := color.New(colorString.Color).SprintFunc()
 
 	return fmt.Sprintf("%s", colorPrint(colorString.Text))
 }

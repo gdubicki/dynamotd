@@ -3,6 +3,7 @@ package plugins
 import (
 	"fmt"
 	"github.com/Tonyfilla/go-humanize"
+	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	memoryLib "github.com/mackerelio/go-osstat/memory"
 )
@@ -11,7 +12,7 @@ func Memory() Row {
 	var warningThreshold = 90.0
 	var criticalThreshold = 95.0
 
-	var color Color
+	var color color.Attribute
 
 	memoryStat, err := memoryLib.Get()
 	if err != nil {

@@ -12,7 +12,6 @@ var MaxRows = 40
 var config = viper.New()
 
 func init() {
-	config.SetDefault("mode", "static")
 	config.SetDefault("rows", []string{
 		"timestamp",
 		"",
@@ -38,11 +37,6 @@ func init() {
 			panic(fmt.Errorf("Fatal error in config file: %s \n", err))
 		}
 	}
-}
-
-func IsModeStatic() bool {
-	mode := config.GetString("mode")
-	return mode == "static"
 }
 
 func GetRows() []Row {

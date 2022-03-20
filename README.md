@@ -12,7 +12,7 @@ it, then something IS wrong with the server, isn't it?).
 ![Dynamotd](dynamotd.png)
 
 * **Useful default info** - CPU load, memory use, disk space use etc.,
-* **Semantic colors** - <span style="color:red">red</span> ~ problem, <span style="color:orange">orange</span> ~ warning.
+* **Semantic colors** - <span style="color:red">red</span> ~ problem, <span style="color:yellow">yellow</span> ~ warning.
 * **Customizable** - reorder or remove lines,
 * **Fast** - native app,
 
@@ -27,8 +27,8 @@ Check out the available command-line arguments by running `dynamotd -help`.
 
 
 If you like it you can add it to your system as a dynamic MOTD by following one of these great guides:
-* [Ubuntu/Debian](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/),
-* (TODO: add RedHat/Centos and more)
+* [Debian/Ubuntu](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/),
+* (TODO: add RedHat/Centos/Rocky and more)
 
 ## Building
 
@@ -45,11 +45,10 @@ How-to build:
 These features will be implemented in the future:
 
 * **Pluggable** - add custom lines with any label and any command(s) output as the value,
-* **Static and dynamic mode** - the former just prints the current state, the latter updates every 2 seconds,
-  like htop,
-* **Keyboard shortcuts** - to run popular tools (in dynamic mode only) like htop, iftop etc.
+* **Interactive mode** - show the output like `htop`, updated every 2 seconds,
+* **Keyboard shortcuts** - in interactive mode only, to run popular tools like htop, iftop etc.
 * **Circuit-breaker** - minimal info mode in case of server overload detection,
-* **Native packages for Centos and Ubuntu** - so you can easily install it on (almost) all of your servers.
+* **Native packages for RedHat/Centos/Rocky and Debian/Ubuntu** - easy install it on (almost) all of your servers.
 
 We also don't have the tests yet and the building pipeline (but they WILL be created if we decide to go ahead with the project).
 

@@ -3,6 +3,7 @@ package plugins
 import (
 	"fmt"
 	"github.com/Tonyfilla/go-humanize"
+	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/minio/minio/pkg/disk"
 )
@@ -11,7 +12,7 @@ func DiskSpace(path string) Row {
 	var warningThreshold = 75.0
 	var criticalThreshold = 90.0
 
-	var color Color
+	var color color.Attribute
 
 	di, err := disk.GetInfo(path)
 	if err != nil {

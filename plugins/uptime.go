@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/shirou/gopsutil/host"
 )
@@ -18,8 +19,8 @@ func Uptime() Row {
 	}
 }
 
-func getUptimeColorAndString() (Color, string) {
-	var color Color
+func getUptimeColorAndString() (color.Attribute, string) {
+	var color color.Attribute
 
 	uptime, _ := host.Uptime()
 
