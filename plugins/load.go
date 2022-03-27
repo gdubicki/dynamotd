@@ -54,8 +54,13 @@ func Load() Row {
 	}
 	mhz := int(cpuStat[0].Mhz)
 
+	unit := "core"
+	if cores >= 2 {
+		unit = unit + "s"
+	}
+
 	return Row{
-		Label: SingleColorLabel("Load (1/5/15)"),
+		Label: SingleColorLabel("CPU Load (1/5/15)"),
 		Value: ToColorText(
 			ColorString{Color: load1color, Text: fmt.Sprintf("%.2f", load1)},
 			ValueDescription(" / "),
@@ -64,7 +69,7 @@ func Load() Row {
 			ColorString{Color: load15color, Text: fmt.Sprintf("%.2f", load15)},
 			ValueDescription(" with "),
 			ValueNeutral(fmt.Sprintf("%d", int(cores))),
-			ValueDescription(" core(s) at "),
+			ValueDescription(fmt.Sprintf(" %s at ", unit)),
 			ValueNeutral(fmt.Sprintf("%d MHz", mhz)),
 		),
 	}

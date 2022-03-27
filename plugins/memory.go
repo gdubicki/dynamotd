@@ -32,13 +32,13 @@ func Memory() Row {
 	}
 
 	return Row{
-		Label: SingleColorLabel("Memory"),
+		Label: SingleColorLabel("RAM"),
 		Value: ToColorText(
 			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(memoryUsedBytes, 2))},
 			ValueDescription(" of "),
 			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(memoryTotalBytes, 2))),
 			ValueDescription(" RAM used ("),
-			ColorString{Color: color, Text: fmt.Sprintf("%0.2f%%", percentage)},
+			ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentage)},
 			ValueDescription(")"),
 		),
 	}

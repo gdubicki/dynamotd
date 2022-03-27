@@ -8,28 +8,25 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/mackerelio/go-osstat v0.2.1
 	github.com/minio/minio v0.0.0-20200926040242-511424a287e7
-	github.com/rivo/tview v0.0.0-20191129065140-82b05c9fb329
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/viper v1.6.1
+	github.com/stretchr/testify v1.4.0
 )
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
-	github.com/gdamore/encoding v1.0.0 // indirect
-	github.com/gdamore/tcell v1.3.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/lucasb-eyer/go-colorful v1.0.2 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/montanaflynn/stats v0.5.0 // indirect
 	github.com/ncw/directio v1.0.5 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
-	github.com/rivo/uniseg v0.1.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
