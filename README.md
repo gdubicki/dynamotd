@@ -16,19 +16,35 @@ it, then something IS wrong with the server, isn't it?).
 * **Customizable** - reorder or remove lines,
 * **Fast** - native app,
 
-## How-to
+## Installation
 
-Download the single binary from the releases.
+1. Download the lastest binary for your OS and arch, f.e.:
+```
+curl https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd
+```
+2. (Optionally) Configure with `/etc/dynamotd.yaml` file. See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
-Optionally configure with `dynamotd.yaml` file in the current dir, `~/.dynamotd/` or `/etc/`.
+3. Make it shown instead of after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
+```
+session    optional pam_exec.so stdout /usr/local/bin/dynamotd -force-color
+```
+(or `-no-color` if you prefer plain black-and-white output).
+
+## Troubleshooting
+
+**Problem**: dynamic MOTD is not shown during login.
+
+**Solution(s)**: there could be multiple reason for this.
+
+One of them is if you use SSH multiplexing (`ControlPath`, `ControlMaster`, `ControlPersist` in your SSH config) - then the MOTD will be shown only during creation of the first connection to the server. Read more about it [here](https://blog.plover.com/Unix/sshd.html).
+
+TODO: expand this section as more cases are identified.
+
+## Configuration
+
 See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
-Check out the available command-line arguments by running `dynamotd -help`.
-
-
-If you like it you can add it to your system as a dynamic MOTD by following one of these great guides:
-* [Debian/Ubuntu](https://ownyourbits.com/2017/04/05/customize-your-motd-login-message-in-debian-and-ubuntu/),
-* (TODO: add RedHat/Centos/Rocky and more)
+Check out all the available command-line arguments by running `dynamotd -help`.
 
 ## Building
 
