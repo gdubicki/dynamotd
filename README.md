@@ -18,9 +18,9 @@ it, then something IS wrong with the server, isn't it?).
 
 ## Installation
 
-1. Download the lastest binary for your OS and arch, f.e.:
+1. Download the lastest binary for your OS and arch and make it executable:
 ```
-curl https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd
+curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd && chmod +x /usr/local/bin/dynamotd
 ```
 2. (Optionally) Configure with `/etc/dynamotd.yaml` file. See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
