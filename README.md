@@ -61,6 +61,8 @@ How to run tests:
 go test -v tests/*
 ```
 
+Optional, but recommended: use [pre-commit](https://pre-commit.com) and install use apps.
+
 ## TODO
 
 These features will be implemented in the future:
