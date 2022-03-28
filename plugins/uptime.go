@@ -20,48 +20,85 @@ func Uptime() Row {
 }
 
 func getUptimeColorAndString() (color.Attribute, string) {
-	var color color.Attribute
+	uptimeSeconds, _ := host.Uptime()
 
-	uptime, _ := host.Uptime()
+	uptimeColor := GetUptimeColor(uptimeSeconds)
+	uptimeString := GetUptimeString(uptimeSeconds)
 
-	var secondsInAYear uint64 = 60 * 60 * 24 * 365
-	years := uptime / secondsInAYear
+	return uptimeColor, uptimeString
+}
 
-	var secondsInAMonth uint64 = 60 * 60 * 24 * 30
-	months := (uptime - (years * secondsInAYear)) / secondsInAMonth
-
-	var secondsInADay uint64 = 60 * 60 * 24
-	days := (uptime - (years * secondsInAYear) - (months * secondsInAMonth)) / secondsInADay
-
-	var secondsInAnHour uint64 = 60 * 60
-	hours := (uptime - (years * secondsInAYear) - (months * secondsInAMonth) - (days * secondsInADay)) / secondsInAnHour
-
-	var secondsInAMinute uint64 = 60
-	minutes := (uptime - (years * secondsInAYear) - (months * secondsInAMonth) - (days * secondsInADay) - (hours * secondsInAnHour)) / secondsInAMinute
+func GetUptimeColor(uptimeSeconds uint64) color.Attribute {
+	uptimeValues := getUptimeValues(uptimeSeconds)
 
 	// TODO: make this configurable
-	if years >= 1 {
-		color = ValueCriticalColor
-	} else if months >= 3 {
-		color = ValueWarningColor
+	if uptimeValues["year"] >= 1 {
+		return ValueCriticalColor
+	} else if uptimeValues["month"] >= 3 {
+		return ValueWarningColor
 	} else {
-		color = ValueOkColor
+		return ValueOkColor
 	}
+}
+
+func GetUptimeString(uptimeSeconds uint64) string {
+	if uptimeSeconds < 60 {
+		return "less than 1 minute"
+	}
+
+	uptimeValues := getUptimeValues(uptimeSeconds)
+	var uptimeUnits = []string{"year", "month", "day", "hour", "minute"}
 
 	uptimeString := ""
-	if years >= 1 {
-		uptimeString += fmt.Sprintf("%d year(s), ", years)
-	}
-	if months >= 1 {
-		uptimeString += fmt.Sprintf("%d month(s), ", months)
-	}
-	if days >= 1 {
-		uptimeString += fmt.Sprintf("%d day(s), ", days)
-	}
-	if hours >= 1 {
-		uptimeString += fmt.Sprintf("%d hour(s), ", hours)
-	}
-	uptimeString += fmt.Sprintf("%d minute(s)", minutes)
+	first := true
 
-	return color, uptimeString
+	for unitNo := 0; unitNo < 5; unitNo++ {
+
+		unitSingular := uptimeUnits[unitNo]
+		unitPlural := uptimeUnits[unitNo] + "s"
+
+		if uptimeValues[unitPlural] > 0 {
+			if !first {
+				uptimeString += ", "
+			}
+
+			if uptimeValues[unitPlural] == 1 {
+				uptimeString += fmt.Sprintf("%d %s", uptimeValues[unitPlural], unitSingular)
+			} else { // >= 2
+				uptimeString += fmt.Sprintf("%d %s", uptimeValues[unitPlural], unitPlural)
+			}
+
+			first = false
+		}
+	}
+
+	return uptimeString
+}
+
+func getUptimeValues(uptimeSeconds uint64) map[string]uint64 {
+	var uptimeValues = make(map[string]uint64)
+
+	var secondsInAYear uint64 = 60 * 60 * 24 * 365
+	uptimeValues["years"] = uptimeSeconds / secondsInAYear
+	remainingUptime := uptimeSeconds - (uptimeValues["years"] * secondsInAYear)
+
+	var secondsInAMonth uint64 = 60 * 60 * 24 * 30
+	uptimeValues["months"] = remainingUptime / secondsInAMonth
+	remainingUptime = remainingUptime - (uptimeValues["months"] * secondsInAMonth)
+
+	var secondsInADay uint64 = 60 * 60 * 24
+	uptimeValues["days"] = remainingUptime / secondsInADay
+	remainingUptime = remainingUptime - (uptimeValues["days"] * secondsInADay)
+
+	var secondsInAnHour uint64 = 60 * 60
+	uptimeValues["hours"] = remainingUptime / secondsInAnHour
+	remainingUptime = remainingUptime - (uptimeValues["hours"] * secondsInAnHour)
+
+	var secondsInAMinute uint64 = 60
+	uptimeValues["minutes"] = remainingUptime / secondsInAMinute
+	remainingUptime = remainingUptime - (uptimeValues["hours"] * secondsInAnHour)
+
+	uptimeValues["seconds"] = remainingUptime
+
+	return uptimeValues
 }

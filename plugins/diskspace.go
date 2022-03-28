@@ -36,7 +36,7 @@ func DiskSpace(path string) Row {
 			ValueDescription(" of "),
 			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(di.Total, 0))),
 			ValueDescription(" disk space used ("),
-			ColorString{Color: color, Text: fmt.Sprintf("%0.2f%%", percentageUsed)},
+			ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentageUsed)},
 			ValueDescription(")"),
 		),
 	}
