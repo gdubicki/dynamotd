@@ -1,12 +1,7 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
-  - repo: local
+  - repo: https://github.com/gdubicki/pre-commit-pngquant
+    rev: 777d63c
     hooks:
-      # minimize screenshot(s)
       - id: pngquant
-        name: pngquant
-        entry: pngquant --force --verbose --ext .png --skip-if-larger
-        language: system
-        pass_filenames: true
-        files: \*.png
