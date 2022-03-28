@@ -32,9 +32,9 @@ func GetUptimeColor(uptimeSeconds uint64) color.Attribute {
 	uptimeValues := getUptimeValues(uptimeSeconds)
 
 	// TODO: make this configurable
-	if uptimeValues["year"] >= 1 {
+	if uptimeValues["years"] >= 1 {
 		return ValueCriticalColor
-	} else if uptimeValues["month"] >= 3 {
+	} else if uptimeValues["months"] >= 3 {
 		return ValueWarningColor
 	} else {
 		return ValueOkColor

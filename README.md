@@ -46,14 +46,19 @@ See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
 Check out all the available command-line arguments by running `dynamotd -help`.
 
-## Building
+## Contributing
 
 Requirements:
 * Go v. 1.17+
 
-How-to build:
+How to build:
 ```
 ./build.sh
+```
+
+How to run tests:
+```
+go test -v tests/*
 ```
 
 ## TODO
