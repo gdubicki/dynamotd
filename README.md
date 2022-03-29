@@ -7,12 +7,14 @@ This app provides a [MOTD (Message Of The Day)](https://en.wikipedia.org/wiki/Mo
 providing the info about your server that YOU need to troubleshoot stuff when you SSH to it (because if you are doing
 it, then something IS wrong with the server, isn't it?).   
 
+## Screenshot 
+
+<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/dynamotd.png" width="1000px" alt="logo">
+
 ## Features
 
-![Dynamotd](dynamotd.png)
-
 * **Useful default info** - CPU load, memory use, disk space use etc.,
-* **Semantic colors** - <span style="color:red">red</span> ~ problem, <span style="color:yellow">yellow</span> ~ warning.
+* **Semantic colors** - <span style="color:red">red</span> → problem, <span style="color:yellow">yellow</span> → warning, <span style="color:blue">blue</span> → ok.
 * **Customizable** - reorder or remove lines,
 * **Fast** - native app,
 
