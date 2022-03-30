@@ -26,7 +26,7 @@ curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-l
 ```
 2. (Optionally) Configure with `/etc/dynamotd.yaml` file. See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
-3. Make it shown instead of after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
+3. Make it shown instead of or after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
 ```
 session    optional pam_exec.so stdout /usr/local/bin/dynamotd -force-color
 ```
