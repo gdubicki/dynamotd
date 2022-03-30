@@ -75,9 +75,7 @@ These features will be implemented in the future:
 * **Circuit-breaker** - minimal info mode in case of server overload detection,
 * **Native packages for RedHat/Centos/Rocky and Debian/Ubuntu** - easy install it on (almost) all of your servers.
 
-We also don't have the tests yet and the building pipeline (but they WILL be created if we decide to go ahead with the project).
-
-Finally, we don't have user docs, developer docs and contribution guide.
+We also don't have user docs, developer docs and contribution guide.
 
 What we DO have is some non-idiomatic code and brain-dead solutions because the original author is only learning Golang.
 :P
