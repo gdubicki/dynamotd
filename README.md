@@ -14,7 +14,7 @@ it, then something IS wrong with the server, isn't it?).
 ## Features
 
 * **Useful default info** - CPU load, memory use, disk space use etc.,
-* **Semantic colors** - <span style="color:red">red</span> → problem, <span style="color:yellow">yellow</span> → warning, <span style="color:blue">blue</span> → ok.
+* **Semantic colors** - <span style="color:red">red</span> → problem, <span style="color:yellow">yellow</span> → warning, <span style="color:green">green</span> → ok.
 * **Customizable** - reorder or remove lines,
 * **Fast** - native app,
 
