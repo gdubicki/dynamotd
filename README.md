@@ -9,7 +9,7 @@ it, then something IS wrong with the server, isn't it?).
 
 ## Screenshot 
 
-<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/dynamotd.png" width="1000px" alt="logo">
+<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/dynamotd.png" width="1000px" alt="screenshot">
 
 ## Features
 
