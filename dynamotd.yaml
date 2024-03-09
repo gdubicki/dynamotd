@@ -1,13 +1,14 @@
 # This is a configuration file example.
 # It is completely optional. The values below represent the defaults.
 
+# empty line is an empty line, duh
 rows:
-  - "timestamp"
-  - ""
-  - "fqdn"
-  - "ip"
-  - "uptime"
-  - ""
-  - "load"
-  - "memory"
-  - "diskspace"
+  - timestamp
+  -
+  - fqdn
+  - ip
+  - uptime
+  -
+  - load
+  - memory
+  - diskspace

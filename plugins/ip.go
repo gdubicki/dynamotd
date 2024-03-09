@@ -3,7 +3,7 @@ package plugins
 import (
 	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strings"
@@ -69,7 +69,7 @@ func getExternalIP() string {
 			return "can't get / too slow internet connection!"
 		}
 		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return "can't get - check internet connection!"
 		}

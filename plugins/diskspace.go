@@ -5,7 +5,7 @@ import (
 	"github.com/Tonyfilla/go-humanize"
 	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
-	"github.com/minio/minio/pkg/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 func DiskSpace(path string) Row {
@@ -14,12 +14,12 @@ func DiskSpace(path string) Row {
 
 	var color color.Attribute
 
-	di, err := disk.GetInfo(path)
+	du, err := disk.Usage("/")
 	if err != nil {
 		panic(fmt.Errorf("error getting disk info"))
 	}
 
-	percentageUsed := (float64(di.Total-di.Free) / float64(di.Total)) * 100
+	percentageUsed := du.UsedPercent
 
 	if percentageUsed >= warningThreshold {
 		color = ValueCriticalColor
@@ -32,9 +32,9 @@ func DiskSpace(path string) Row {
 	return Row{
 		Label: SingleColorLabel("Disk space (/)"),
 		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(di.Total-di.Free, 2))},
+			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(du.Used, 2))},
 			ValueDescription(" of "),
-			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(di.Total, 0))),
+			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(du.Total, 0))),
 			ValueDescription(" disk space used ("),
 			ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentageUsed)},
 			ValueDescription(")"),

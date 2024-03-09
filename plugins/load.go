@@ -3,8 +3,8 @@ package plugins
 import (
 	"fmt"
 	. "github.com/gdubicki/dynamotd/dynamotd"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/load"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/load"
 	"runtime"
 )
 

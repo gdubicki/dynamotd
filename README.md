@@ -20,7 +20,7 @@ it, then something IS wrong with the server, isn't it?).
 
 ## Installation
 
-1. Download the lastest binary for your OS and arch and make it executable:
+1. Download the latest binary for your OS and arch and make it executable, f.e. for Linux on AMD64:
 ```
 curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd && chmod +x /usr/local/bin/dynamotd
 ```
@@ -28,7 +28,7 @@ curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-l
 
 3. Make it shown instead of or after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
 ```
-session    optional pam_exec.so stdout /usr/local/bin/dynamotd -force-color
+session    optional     pam_exec.so stdout /usr/local/bin/dynamotd -force-color
 ```
 (or `-no-color` if you prefer plain black-and-white output).
 
@@ -51,7 +51,7 @@ Check out all the available command-line arguments by running `dynamotd -help`.
 ## Contributing
 
 Requirements:
-* Go v. 1.17+
+* Go v. 1.22+
 
 How to build:
 ```
@@ -63,7 +63,7 @@ How to run tests:
 go test -v tests/*
 ```
 
-Optional, but recommended: use [pre-commit](https://pre-commit.com) and install use apps.
+Optional, but recommended: use [pre-commit](https://pre-commit.com) and install the apps used by our config.
 
 ## TODO
 
@@ -77,5 +77,5 @@ These features will be implemented in the future:
 
 We also don't have user docs, developer docs and contribution guide.
 
-What we DO have is some non-idiomatic code and brain-dead solutions because the original author is only learning Golang.
+What we DO have is some non-idiomatic code because the original author is only learning Golang.
 :P

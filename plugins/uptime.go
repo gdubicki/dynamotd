@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
-	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 func Uptime() Row {
