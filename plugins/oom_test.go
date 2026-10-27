@@ -44,15 +44,23 @@ func TestFindLastOOMKill(t *testing.T) {
 	last, found := findLastOOMKill(kernelLogWithOOMKills, testBootTime)
 
 	require.True(t, found)
-	assert.Equal(t, "postgres", last.process)
-	assert.Equal(t, testBootTime.Add(48*time.Hour), last.time)
+	require.NotNil(t, last.kill)
+	assert.Equal(t, "postgres", last.kill.process)
+	assert.Equal(t, testBootTime.Add(48*time.Hour), last.kill.time)
 
-	_, found = findLastOOMKill(kernelLogWithOOMKills[:1], testBootTime)
+	// the kills are no longer in the kernel log, so they happened before its oldest record
+	last, found = findLastOOMKill(kernelLogWithOOMKills[4:], testBootTime)
+	require.True(t, found)
+	assert.Nil(t, last.kill)
+	assert.Equal(t, testBootTime.Add(172900*time.Second), last.before)
+
+	_, found = findLastOOMKill(nil, testBootTime)
 	assert.False(t, found)
 }
 
 func TestOOMKillsValue(t *testing.T) {
 	lastKill := testBootTime.Add(48 * time.Hour)
+	oldestRecord := testBootTime.Add(172900 * time.Second)
 
 	tests := []struct {
 		name     string
@@ -67,7 +75,11 @@ func TestOOMKillsValue(t *testing.T) {
 			"2 OOM kills since boot, last 2 days ago (postgres, " + lastKill.Format("2006-01-02 15:04") + ")", "warning"},
 		{"kernel log not readable", nil, lastKill,
 			"2 OOM kills since boot", "critical"},
-		{"no longer in the kernel log", kernelLogWithOOMKills[:1], lastKill,
+		{"no longer in the kernel log, which starts over 24h ago", kernelLogWithOOMKills[4:], lastKill.Add(30 * time.Hour),
+			"2 OOM kills since boot, last over 29 hours ago (before " + oldestRecord.Format("2006-01-02 15:04") + ")", "warning"},
+		{"no longer in the kernel log, which starts within 24h", kernelLogWithOOMKills[4:], lastKill.Add(3 * time.Hour),
+			"2 OOM kills since boot, last over 2 hours ago (before " + oldestRecord.Format("2006-01-02 15:04") + ")", "critical"},
+		{"empty kernel log", []string{}, lastKill,
 			"2 OOM kills since boot", "critical"},
 	}
 	for _, tt := range tests {

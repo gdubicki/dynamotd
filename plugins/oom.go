@@ -20,6 +20,14 @@ type oomKill struct {
 	process string
 }
 
+// lastOOMKillInfo is what is known about the last OOM kill from the kernel log
+type lastOOMKillInfo struct {
+	// the last kill, if it's still in the kernel log
+	kill *oomKill
+	// otherwise, the time of the oldest record in the kernel log - the last kill happened before it
+	before time.Time
+}
+
 // for mocking in tests
 var readKernelLog = readKmsg
 var getBootTime = host.BootTime
@@ -29,16 +37,17 @@ var now = time.Now
 // "Memory cgroup out of memory: Killed process 1234 (java) ..."
 var killedProcessRegexp = regexp.MustCompile(`Killed process \d+ \(([^)]+)\)`)
 
-// lastOOMKill returns the last OOM kill found in the kernel log. It may be not found if the log
-// is not readable (it requires root) or if the kernel's log buffer has been overwritten since.
-func lastOOMKill() (oomKill, bool) {
+// lastOOMKill returns what is known about the last OOM kill from the kernel log, which is not readable
+// without root. The kill may be no longer in the kernel's log buffer if it has been overwritten since,
+// but then we know at least that it happened before the oldest record in it.
+func lastOOMKill() (lastOOMKillInfo, bool) {
 	records, err := readKernelLog()
 	if err != nil {
-		return oomKill{}, false
+		return lastOOMKillInfo{}, false
 	}
 	bootTime, err := getBootTime()
 	if err != nil {
-		return oomKill{}, false
+		return lastOOMKillInfo{}, false
 	}
 	return findLastOOMKill(records, time.Unix(int64(bootTime), 0))
 }
@@ -46,7 +55,7 @@ func lastOOMKill() (oomKill, bool) {
 // findLastOOMKill finds the last OOM kill in the /dev/kmsg records, which are like:
 // "6,1234,5678901234,-;Out of memory: Killed process 4321 (java) total-vm:..."
 // where the 3rd field is the time since boot in µs.
-func findLastOOMKill(records []string, bootTime time.Time) (oomKill, bool) {
+func findLastOOMKill(records []string, bootTime time.Time) (lastOOMKillInfo, bool) {
 	for i := len(records) - 1; i >= 0; i-- {
 		header, message, found := strings.Cut(records[i], ";")
 		if !found {
@@ -56,21 +65,36 @@ func findLastOOMKill(records []string, bootTime time.Time) (oomKill, bool) {
 		if match == nil {
 			continue
 		}
-		fields := strings.Split(header, ",")
-		if len(fields) < 3 {
-			continue
+		if recordTime, ok := kmsgRecordTime(header, bootTime); ok {
+			return lastOOMKillInfo{kill: &oomKill{time: recordTime, process: match[1]}}, true
 		}
-		sinceBoot, err := strconv.ParseInt(fields[2], 10, 64)
-		if err != nil {
-			continue
-		}
-		return oomKill{time: bootTime.Add(time.Duration(sinceBoot) * time.Microsecond), process: match[1]}, true
 	}
-	return oomKill{}, false
+
+	// not found, so it happened before the oldest record
+	for _, record := range records {
+		header, _, _ := strings.Cut(record, ";")
+		if recordTime, ok := kmsgRecordTime(header, bootTime); ok {
+			return lastOOMKillInfo{before: recordTime}, true
+		}
+	}
+	return lastOOMKillInfo{}, false
+}
+
+func kmsgRecordTime(header string, bootTime time.Time) (time.Time, bool) {
+	fields := strings.Split(header, ",")
+	if len(fields) < 3 {
+		return time.Time{}, false
+	}
+	sinceBoot, err := strconv.ParseInt(fields[2], 10, 64)
+	if err != nil {
+		return time.Time{}, false
+	}
+	return bootTime.Add(time.Duration(sinceBoot) * time.Microsecond), true
 }
 
 // oomKillsValue describes the OOM kills since boot, f.e.
-// "3 OOM kills since boot, last 2 days ago (java, 2026-10-25 14:03)"
+// "3 OOM kills since boot, last 2 days ago (java, 2026-10-25 14:03)", or if the last kill is no longer
+// in the kernel log: "3 OOM kills since boot, last over 1 day ago (before 2026-10-26 10:56)"
 func oomKillsValue(count uint64) []dynamotd.ColorString {
 	unit := "OOM kill"
 	if count > 1 {
@@ -78,8 +102,16 @@ func oomKillsValue(count uint64) []dynamotd.ColorString {
 	}
 
 	last, found := lastOOMKill()
+	// the last kill happened at or before this time
+	var lastTime time.Time
+	if found && last.kill != nil {
+		lastTime = last.kill.time
+	} else if found {
+		lastTime = last.before
+	}
+
 	countColor := dynamotd.ValueCriticalColor
-	if found && now().Sub(last.time) > recentOOMKill {
+	if found && now().Sub(lastTime) > recentOOMKill {
 		countColor = dynamotd.ValueWarningColor
 	}
 
@@ -87,14 +119,25 @@ func oomKillsValue(count uint64) []dynamotd.ColorString {
 		{Color: countColor, Text: fmt.Sprintf("%d %s", count, unit)},
 		dynamotd.ValueDescription(" since boot"),
 	}
-	if found {
+	switch {
+	case found && last.kill != nil:
 		value = append(value,
 			dynamotd.ValueDescription(", last "),
-			dynamotd.ColorString{Color: countColor, Text: ago(now().Sub(last.time))},
-			dynamotd.ValueDescription(fmt.Sprintf(" (%s, %s)", last.process, last.time.Local().Format("2006-01-02 15:04"))),
+			dynamotd.ColorString{Color: countColor, Text: ago(now().Sub(lastTime))},
+			dynamotd.ValueDescription(fmt.Sprintf(" (%s, %s)", last.kill.process, formatOOMTime(lastTime))),
+		)
+	case found:
+		value = append(value,
+			dynamotd.ValueDescription(", last "),
+			dynamotd.ColorString{Color: countColor, Text: "over " + ago(now().Sub(lastTime))},
+			dynamotd.ValueDescription(fmt.Sprintf(" (before %s)", formatOOMTime(lastTime))),
 		)
 	}
 	return value
+}
+
+func formatOOMTime(t time.Time) string {
+	return t.Local().Format("2006-01-02 15:04")
 }
 
 // ago returns a rough, human-readable description of how long ago something happened.
