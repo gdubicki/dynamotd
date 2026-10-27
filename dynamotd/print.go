@@ -9,6 +9,8 @@ import (
 )
 
 func Print(rows []Row) {
+	rows = withoutRedundantEmptyLines(rows)
+
 	labelWidth := 0
 	for _, row := range rows {
 		labelWidth = max(labelWidth, utf8.RuneCountInString(row.Label.String()))
@@ -17,6 +19,22 @@ func Print(rows []Row) {
 	for _, row := range rows {
 		printRow(row, labelWidth)
 	}
+}
+
+// withoutRedundantEmptyLines removes the empty lines at the beginning and the end, and merges the consecutive ones,
+// as the rows between them may not have been shown (f.e. failed units when there are none).
+func withoutRedundantEmptyLines(rows []Row) []Row {
+	var result []Row
+	for _, row := range rows {
+		if row.isEmptyLine() && (len(result) == 0 || result[len(result)-1].isEmptyLine()) {
+			continue
+		}
+		result = append(result, row)
+	}
+	if len(result) > 0 && result[len(result)-1].isEmptyLine() {
+		result = result[:len(result)-1]
+	}
+	return result
 }
 
 func printRow(row Row, labelWidth int) {
