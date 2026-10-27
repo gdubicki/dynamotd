@@ -1,58 +1,103 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+
 	. "github.com/gdubicki/dynamotd/dynamotd"
 	. "github.com/gdubicki/dynamotd/plugins"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
-var MaxRows = 40
+const maxRows = 40
 
-var config = viper.New()
+const configFileName = "dynamotd.yaml"
 
-func init() {
-	config.SetDefault("rows", []string{
-		"timestamp",
-		"",
-		"fqdn",
-		"ip",
-		"uptime",
-		"",
-		"load",
-		"memory",
-		"diskspace",
-	})
+var defaultRows = []string{
+	"timestamp",
+	"",
+	"fqdn",
+	"ip",
+	"uptime",
+	"",
+	"load",
+	"memory",
+	"diskspace",
+}
 
-	config.SetConfigName("dynamotd.yaml")
-	config.AddConfigPath("/etc/")
-	config.AddConfigPath("$HOME/.dynamotd")
-	config.AddConfigPath(".")
+type config struct {
+	Rows []string `yaml:"rows"`
+}
 
-	err := config.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// that's ok - we don't need a config file for this app. the defaults are enough to run it.
+// configPaths returns the locations of the config file, in the order they are searched.
+func configPaths() []string {
+	paths := []string{filepath.Join("/etc", configFileName)}
+	if home, err := os.UserHomeDir(); err == nil {
+		paths = append(paths, filepath.Join(home, ".dynamotd", configFileName))
+	}
+	return append(paths, configFileName)
+}
+
+// loadConfig reads the first config file found. The config file is optional -
+// the defaults are enough to run this app.
+func loadConfig() (config, error) {
+	for _, path := range configPaths() {
+		data, err := os.ReadFile(path)
+		if errors.Is(err, fs.ErrNotExist) {
+			continue
+		}
+		if err != nil {
+			return config{}, err
+		}
+		return parseConfig(data, path)
+	}
+	return config{Rows: defaultRows}, nil
+}
+
+func parseConfig(data []byte, path string) (config, error) {
+	var raw struct {
+		// pointers, as otherwise the empty (null) elements, used for empty lines, would be skipped
+		Rows *[]*string `yaml:"rows"`
+	}
+	if err := yaml.Unmarshal(data, &raw); err != nil {
+		return config{}, fmt.Errorf("error in config file %s: %w", path, err)
+	}
+
+	// nil means no "rows" key at all, so use the defaults
+	if raw.Rows == nil {
+		return config{Rows: defaultRows}, nil
+	}
+
+	rows := make([]string, 0, len(*raw.Rows))
+	for _, row := range *raw.Rows {
+		if row == nil {
+			rows = append(rows, "")
 		} else {
-			panic(fmt.Errorf("Fatal error in config file: %s \n", err))
+			rows = append(rows, *row)
 		}
 	}
+
+	if len(rows) == 0 {
+		return config{}, fmt.Errorf("error in config file %s: no rows defined", path)
+	}
+	if len(rows) > maxRows {
+		return config{}, fmt.Errorf("error in config file %s: more rows than %d not supported", path, maxRows)
+	}
+	return config{Rows: rows}, nil
 }
 
 func GetRows() []Row {
 	var rows []Row
 
-	rowsStrings := config.GetStringSlice("rows")
-
-	if len(rowsStrings) == 0 {
-		panic(fmt.Errorf("no rows defined"))
+	cfg, err := loadConfig()
+	if err != nil {
+		panic(err)
 	}
 
-	if len(rowsStrings) > MaxRows {
-		panic(fmt.Errorf("more rows than %d not supported", MaxRows))
-	}
-
-	for _, rowString := range rowsStrings {
+	for _, rowString := range cfg.Rows {
 
 		// TODO: consider using reflection to be able to add row types without editing this file
 		switch rowString {
