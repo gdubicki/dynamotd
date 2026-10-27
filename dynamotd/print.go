@@ -41,6 +41,6 @@ func getStringToPrint(colorString ColorString) string {
 		colorPrint := color.New(colorString.Color).SprintFunc()
 		return fmt.Sprintf("%s", colorPrint(colorString.Text))
 	} else {
-		return fmt.Sprintf(colorString.Text)
+		return colorString.Text
 	}
 }

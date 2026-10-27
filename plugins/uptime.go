@@ -96,7 +96,7 @@ func getUptimeValues(uptimeSeconds uint64) map[string]uint64 {
 
 	var secondsInAMinute uint64 = 60
 	uptimeValues["minutes"] = remainingUptime / secondsInAMinute
-	remainingUptime = remainingUptime - (uptimeValues["hours"] * secondsInAnHour)
+	remainingUptime = remainingUptime - (uptimeValues["minutes"] * secondsInAMinute)
 
 	uptimeValues["seconds"] = remainingUptime
 

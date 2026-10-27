@@ -14,23 +14,23 @@ func DiskSpace(path string) Row {
 
 	var color color.Attribute
 
-	du, err := disk.Usage("/")
+	du, err := disk.Usage(path)
 	if err != nil {
 		panic(fmt.Errorf("error getting disk info"))
 	}
 
 	percentageUsed := du.UsedPercent
 
-	if percentageUsed >= warningThreshold {
+	if percentageUsed >= criticalThreshold {
 		color = ValueCriticalColor
-	} else if percentageUsed >= criticalThreshold {
+	} else if percentageUsed >= warningThreshold {
 		color = ValueWarningColor
 	} else {
 		color = ValueOkColor
 	}
 
 	return Row{
-		Label: SingleColorLabel("Disk space (/)"),
+		Label: SingleColorLabel(fmt.Sprintf("Disk space (%s)", path)),
 		Value: ToColorText(
 			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(du.Used, 2))},
 			ValueDescription(" of "),
