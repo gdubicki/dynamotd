@@ -1,78 +1,77 @@
 package plugins
 
 import (
-	"github.com/fatih/color"
-	. "github.com/gdubicki/dynamotd/dynamotd"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gdubicki/dynamotd/dynamotd"
 )
 
-func Ip() Row {
-	localIP := getLocalIP()
-	externalIP := getExternalIP()
+func init() {
+	dynamotd.Register(Ip, "ip")
+}
 
-	var localIPcolor, externalIPcolor color.Attribute
-
-	if strings.Contains(localIP, "can't") {
-		localIPcolor = ValueCriticalColor
-	} else {
-		localIPcolor = ValueNeutralColor
-	}
-
-	if strings.Contains(externalIP, "can't") {
-		externalIPcolor = ValueCriticalColor
-	} else {
-		externalIPcolor = ValueNeutralColor
-	}
-
-	return Row{
-		Label: SingleColorLabel("IP"),
-		Value: ToColorText(
-			ColorString{Color: localIPcolor, Text: localIP},
-			ValueDescription(" (external: "),
-			ColorString{Color: externalIPcolor, Text: externalIP},
-			ValueDescription(")"),
+func Ip() dynamotd.Row {
+	return dynamotd.Row{
+		Label: dynamotd.SingleColorLabel("IP"),
+		Value: dynamotd.ToColorText(
+			ipColorString(getLocalIP()),
+			dynamotd.ValueDescription(" (external: "),
+			ipColorString(getExternalIP()),
+			dynamotd.ValueDescription(")"),
 		),
 	}
 }
 
+func ipColorString(ip string, err error) dynamotd.ColorString {
+	if err != nil {
+		return dynamotd.ValueCritical(fmt.Sprintf("can't get: %s", err))
+	}
+	return dynamotd.ValueNeutral(ip)
+}
+
 // get preferred outbound ip of this machine
 // copied from https://stackoverflow.com/a/37382208/2693875
-func getLocalIP() string {
+func getLocalIP() (string, error) {
 	// this does not really make the connection
-
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		return "can't get"
+		return "", err
 	}
 	defer conn.Close()
 
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
-	return localAddr.IP.String()
+	return localAddr.IP.String(), nil
 }
 
 var showFakeIP = false
 
-func getExternalIP() string {
+func getExternalIP() (string, error) {
 	if showFakeIP {
-		return "123.123.123.123"
-	} else {
-		client := http.Client{
-			Timeout: 3 * time.Second,
-		}
-		resp, err := client.Get("https://icanhazip.com")
-		if err != nil {
-			return "can't get / too slow internet connection!"
-		}
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return "can't get - check internet connection!"
-		}
-		return strings.TrimSpace(string(body))
+		return "123.123.123.123", nil
 	}
+
+	client := http.Client{
+		Timeout: 3 * time.Second,
+	}
+	resp, err := client.Get("https://icanhazip.com")
+	if err != nil {
+		return "", fmt.Errorf("no or too slow internet connection")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected HTTP status %s", resp.Status)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("check internet connection")
+	}
+	return strings.TrimSpace(string(body)), nil
 }

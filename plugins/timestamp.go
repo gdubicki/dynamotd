@@ -1,15 +1,19 @@
 package plugins
 
 import (
-	"fmt"
-	. "github.com/gdubicki/dynamotd/dynamotd"
 	"time"
+
+	"github.com/gdubicki/dynamotd/dynamotd"
 )
 
-func Timestamp() Row {
+func init() {
+	dynamotd.Register(Timestamp, "timestamp")
+}
+
+func Timestamp() dynamotd.Row {
 	timestamp := time.Now().Format("2006-01-02 15:04:05 MST")
-	return Row{
-		Label: SingleColorLabel("Information as of"),
-		Value: SingleColorValue(fmt.Sprintf("%s", timestamp)),
+	return dynamotd.Row{
+		Label: dynamotd.SingleColorLabel("Information as of"),
+		Value: dynamotd.SingleColorValue(timestamp),
 	}
 }

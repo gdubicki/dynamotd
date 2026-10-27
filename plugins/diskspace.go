@@ -2,42 +2,40 @@ package plugins
 
 import (
 	"fmt"
+
 	"github.com/Tonyfilla/go-humanize"
-	"github.com/fatih/color"
-	. "github.com/gdubicki/dynamotd/dynamotd"
+	"github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/shirou/gopsutil/v4/disk"
 )
 
-func DiskSpace(path string) Row {
+func init() {
+	dynamotd.Register(func() dynamotd.Row { return DiskSpace("/") }, "diskspace")
+}
+
+func DiskSpace(path string) dynamotd.Row {
 	var warningThreshold = 75.0
 	var criticalThreshold = 90.0
 
-	var color color.Attribute
+	label := fmt.Sprintf("Disk space (%s)", path)
 
 	du, err := disk.Usage(path)
 	if err != nil {
-		panic(fmt.Errorf("error getting disk info"))
+		return dynamotd.ErrorRow(label, fmt.Errorf("error getting disk info: %w", err))
 	}
 
 	percentageUsed := du.UsedPercent
 
-	if percentageUsed >= criticalThreshold {
-		color = ValueCriticalColor
-	} else if percentageUsed >= warningThreshold {
-		color = ValueWarningColor
-	} else {
-		color = ValueOkColor
-	}
+	color := dynamotd.ThresholdColor(percentageUsed, warningThreshold, criticalThreshold)
 
-	return Row{
-		Label: SingleColorLabel(fmt.Sprintf("Disk space (%s)", path)),
-		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(du.Used, 2))},
-			ValueDescription(" of "),
-			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(du.Total, 0))),
-			ValueDescription(" disk space used ("),
-			ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentageUsed)},
-			ValueDescription(")"),
+	return dynamotd.Row{
+		Label: dynamotd.SingleColorLabel(label),
+		Value: dynamotd.ToColorText(
+			dynamotd.ColorString{Color: color, Text: humanize.IBytesCustomCeil(du.Used, 2)},
+			dynamotd.ValueDescription(" of "),
+			dynamotd.ValueNeutral(humanize.IBytesCustomCeil(du.Total, 0)),
+			dynamotd.ValueDescription(" disk space used ("),
+			dynamotd.ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentageUsed)},
+			dynamotd.ValueDescription(")"),
 		),
 	}
 }

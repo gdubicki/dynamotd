@@ -1,6 +1,8 @@
 package dynamotd
 
 import (
+	"fmt"
+
 	"github.com/fatih/color"
 )
 
@@ -18,9 +20,13 @@ type ColorString struct {
 	Text  string
 }
 
-var LabelColor = color.FgWhite
+// NoColor means "print in the terminal's default color". It is the zero value of color.Attribute,
+// so it is also used for ColorStrings without an explicit color.
+const NoColor = color.Reset
 
-var ValueDescriptionColor = color.FgWhite
+var LabelColor = NoColor
+
+var ValueDescriptionColor = NoColor
 var ValueNeutralColor = color.FgBlue
 var ValueOkColor = color.FgGreen
 var ValueWarningColor = color.FgYellow
@@ -46,19 +52,27 @@ func ValueCritical(text string) ColorString {
 	return ColorString{ValueCriticalColor, text}
 }
 
+// ThresholdColor returns the ok, warning or critical color depending on which threshold the value reached.
+func ThresholdColor(value, warningThreshold, criticalThreshold float64) color.Attribute {
+	switch {
+	case value >= criticalThreshold:
+		return ValueCriticalColor
+	case value >= warningThreshold:
+		return ValueWarningColor
+	default:
+		return ValueOkColor
+	}
+}
+
 // for labels most (every?) of the times we need to have it whole
 // in a single color
 func SingleColorLabel(text string) ColorText {
-	labelString := ColorString{LabelColor, text}
-	singleColorLabel := []ColorString{labelString}
-	return ColorText{singleColorLabel}
+	return ColorText{[]ColorString{{LabelColor, text}}}
 }
 
 // values we also want it in a single color
 func SingleColorValue(text string) ColorText {
-	labelString := ColorString{ValueNeutralColor, text}
-	singleColorLabel := []ColorString{labelString}
-	return ColorText{singleColorLabel}
+	return ColorText{[]ColorString{{ValueNeutralColor, text}}}
 }
 
 // merge a bunch of color strings of a valueDescription to a single color text element
@@ -66,6 +80,24 @@ func ToColorText(colorStrings ...ColorString) ColorText {
 	return ColorText{colorStrings}
 }
 
+// ErrorRow is what a plugin returns when it can't get its data, so that a single failing row
+// doesn't prevent showing the rest of the MOTD.
+func ErrorRow(label string, err error) Row {
+	return Row{
+		Label: SingleColorLabel(label),
+		Value: ToColorText(ValueCritical(fmt.Sprintf("can't get: %s", err))),
+	}
+}
+
 func (row Row) isEmptyLine() bool {
 	return len(row.Label.text) == 0 && len(row.Value.text) == 0
+}
+
+// String returns the text without any colors.
+func (colorText ColorText) String() string {
+	result := ""
+	for _, colorString := range colorText.text {
+		result += colorString.Text
+	}
+	return result
 }

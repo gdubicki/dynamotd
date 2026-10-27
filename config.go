@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/gdubicki/dynamotd/dynamotd"
-	. "github.com/gdubicki/dynamotd/plugins"
 	"gopkg.in/yaml.v3"
 )
 
@@ -87,42 +85,4 @@ func parseConfig(data []byte, path string) (config, error) {
 		return config{}, fmt.Errorf("error in config file %s: more rows than %d not supported", path, maxRows)
 	}
 	return config{Rows: rows}, nil
-}
-
-func GetRows() []Row {
-	var rows []Row
-
-	cfg, err := loadConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	for _, rowString := range cfg.Rows {
-
-		// TODO: consider using reflection to be able to add row types without editing this file
-		switch rowString {
-		case "", "emptyLine":
-			rows = append(rows, EmptyLine())
-		case "timestamp":
-			rows = append(rows, Timestamp())
-		case "fqdn":
-			rows = append(rows, Fqdn())
-		case "load":
-			rows = append(rows, Load())
-		case "ip":
-			rows = append(rows, Ip())
-		case "uptime":
-			rows = append(rows, Uptime())
-		case "cores":
-			rows = append(rows, Cores())
-		case "memory":
-			rows = append(rows, Memory())
-		case "diskspace":
-			rows = append(rows, DiskSpace("/"))
-		default:
-			panic(fmt.Errorf("error while generating row from string '%s' - check for typos", rowString))
-		}
-	}
-
-	return rows
 }

@@ -6,7 +6,6 @@ require (
 	github.com/Showmax/go-fqdn v1.0.0
 	github.com/Tonyfilla/go-humanize v0.0.0-20190109114339-dd7dcc22b778
 	github.com/fatih/color v1.19.0
-	github.com/mackerelio/go-osstat v0.2.8
 	github.com/shirou/gopsutil/v4 v4.26.9
 	github.com/stretchr/testify v1.12.1
 	gopkg.in/yaml.v3 v3.0.1

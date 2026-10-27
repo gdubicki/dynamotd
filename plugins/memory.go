@@ -2,44 +2,43 @@ package plugins
 
 import (
 	"fmt"
+
 	"github.com/Tonyfilla/go-humanize"
-	"github.com/fatih/color"
-	. "github.com/gdubicki/dynamotd/dynamotd"
-	memoryLib "github.com/mackerelio/go-osstat/memory"
+	"github.com/gdubicki/dynamotd/dynamotd"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
-func Memory() Row {
+func init() {
+	dynamotd.Register(Memory, "memory")
+}
+
+const memoryLabel = "RAM"
+
+func Memory() dynamotd.Row {
 	var warningThreshold = 90.0
 	var criticalThreshold = 95.0
 
-	var color color.Attribute
-
-	memoryStat, err := memoryLib.Get()
+	memoryStat, err := mem.VirtualMemory()
 	if err != nil {
-		panic(fmt.Errorf("error getting memory info"))
+		return dynamotd.ErrorRow(memoryLabel, fmt.Errorf("error getting memory info: %w", err))
 	}
 	memoryTotalBytes := memoryStat.Total
-	memoryUsedBytes := memoryStat.Used
+	// memory that is really used, so without caches and buffers that can be freed
+	memoryUsedBytes := memoryStat.Total - memoryStat.Available
 
 	percentage := float64(memoryUsedBytes) / float64(memoryTotalBytes) * 100
 
-	if percentage >= criticalThreshold {
-		color = ValueCriticalColor
-	} else if percentage >= warningThreshold {
-		color = ValueWarningColor
-	} else {
-		color = ValueOkColor
-	}
+	color := dynamotd.ThresholdColor(percentage, warningThreshold, criticalThreshold)
 
-	return Row{
-		Label: SingleColorLabel("RAM"),
-		Value: ToColorText(
-			ColorString{Color: color, Text: fmt.Sprintf("%s", humanize.IBytesCustomCeil(memoryUsedBytes, 2))},
-			ValueDescription(" of "),
-			ValueNeutral(fmt.Sprintf("%s", humanize.IBytesCustomCeil(memoryTotalBytes, 2))),
-			ValueDescription(" RAM used ("),
-			ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentage)},
-			ValueDescription(")"),
+	return dynamotd.Row{
+		Label: dynamotd.SingleColorLabel(memoryLabel),
+		Value: dynamotd.ToColorText(
+			dynamotd.ColorString{Color: color, Text: humanize.IBytesCustomCeil(memoryUsedBytes, 2)},
+			dynamotd.ValueDescription(" of "),
+			dynamotd.ValueNeutral(humanize.IBytesCustomCeil(memoryTotalBytes, 2)),
+			dynamotd.ValueDescription(" RAM used ("),
+			dynamotd.ColorString{Color: color, Text: fmt.Sprintf("%0.0f%%", percentage)},
+			dynamotd.ValueDescription(")"),
 		),
 	}
 }

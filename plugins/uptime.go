@@ -2,42 +2,44 @@ package plugins
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/fatih/color"
-	. "github.com/gdubicki/dynamotd/dynamotd"
+	"github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/shirou/gopsutil/v4/host"
 )
 
-func Uptime() Row {
+func init() {
+	dynamotd.Register(Uptime, "uptime")
+}
 
-	color, uptimeString := getUptimeColorAndString()
+const uptimeLabel = "Uptime"
 
-	return Row{
-		Label: SingleColorLabel("Uptime"),
-		Value: ToColorText(
-			ColorString{Color: color, Text: uptimeString},
+func Uptime() dynamotd.Row {
+	uptimeSeconds, err := host.Uptime()
+	if err != nil {
+		return dynamotd.ErrorRow(uptimeLabel, fmt.Errorf("error getting uptime: %w", err))
+	}
+
+	return dynamotd.Row{
+		Label: dynamotd.SingleColorLabel(uptimeLabel),
+		Value: dynamotd.ToColorText(
+			dynamotd.ColorString{Color: GetUptimeColor(uptimeSeconds), Text: GetUptimeString(uptimeSeconds)},
 		),
 	}
 }
 
-func getUptimeColorAndString() (color.Attribute, string) {
-	uptimeSeconds, _ := host.Uptime()
-
-	uptimeColor := GetUptimeColor(uptimeSeconds)
-	uptimeString := GetUptimeString(uptimeSeconds)
-
-	return uptimeColor, uptimeString
-}
-
 func GetUptimeColor(uptimeSeconds uint64) color.Attribute {
-	uptimeValues := getUptimeValues(uptimeSeconds)
+	uptime := getUptimeValues(uptimeSeconds)
 
 	// TODO: make this configurable
-	if uptimeValues["years"] >= 1 {
-		return ValueCriticalColor
-	} else if uptimeValues["months"] >= 3 {
-		return ValueWarningColor
-	} else {
-		return ValueOkColor
+	switch {
+	case uptime.years >= 1:
+		return dynamotd.ValueCriticalColor
+	case uptime.months >= 3:
+		return dynamotd.ValueWarningColor
+	default:
+		return dynamotd.ValueOkColor
 	}
 }
 
@@ -46,59 +48,55 @@ func GetUptimeString(uptimeSeconds uint64) string {
 		return "less than 1 minute"
 	}
 
-	uptimeValues := getUptimeValues(uptimeSeconds)
-	var uptimeUnits = []string{"year", "month", "day", "hour", "minute"}
+	uptime := getUptimeValues(uptimeSeconds)
 
-	uptimeString := ""
-	first := true
+	units := []struct {
+		name  string
+		value uint64
+	}{
+		{"year", uptime.years},
+		{"month", uptime.months},
+		{"day", uptime.days},
+		{"hour", uptime.hours},
+		{"minute", uptime.minutes},
+	}
 
-	for unitNo := 0; unitNo < 5; unitNo++ {
-
-		unitSingular := uptimeUnits[unitNo]
-		unitPlural := uptimeUnits[unitNo] + "s"
-
-		if uptimeValues[unitPlural] > 0 {
-			if !first {
-				uptimeString += ", "
-			}
-
-			if uptimeValues[unitPlural] == 1 {
-				uptimeString += fmt.Sprintf("%d %s", uptimeValues[unitPlural], unitSingular)
-			} else { // >= 2
-				uptimeString += fmt.Sprintf("%d %s", uptimeValues[unitPlural], unitPlural)
-			}
-
-			first = false
+	var parts []string
+	for _, unit := range units {
+		switch unit.value {
+		case 0:
+			continue
+		case 1:
+			parts = append(parts, fmt.Sprintf("%d %s", unit.value, unit.name))
+		default:
+			parts = append(parts, fmt.Sprintf("%d %ss", unit.value, unit.name))
 		}
 	}
 
-	return uptimeString
+	return strings.Join(parts, ", ")
 }
 
-func getUptimeValues(uptimeSeconds uint64) map[string]uint64 {
-	var uptimeValues = make(map[string]uint64)
+type uptimeValues struct {
+	years, months, days, hours, minutes, seconds uint64
+}
 
-	var secondsInAYear uint64 = 60 * 60 * 24 * 365
-	uptimeValues["years"] = uptimeSeconds / secondsInAYear
-	remainingUptime := uptimeSeconds - (uptimeValues["years"] * secondsInAYear)
+func getUptimeValues(uptimeSeconds uint64) uptimeValues {
+	const (
+		secondsInAMinute = 60
+		secondsInAnHour  = 60 * secondsInAMinute
+		secondsInADay    = 24 * secondsInAnHour
+		secondsInAMonth  = 30 * secondsInADay
+		secondsInAYear   = 365 * secondsInADay
+	)
 
-	var secondsInAMonth uint64 = 60 * 60 * 24 * 30
-	uptimeValues["months"] = remainingUptime / secondsInAMonth
-	remainingUptime = remainingUptime - (uptimeValues["months"] * secondsInAMonth)
+	var values uptimeValues
+	remaining := uptimeSeconds
 
-	var secondsInADay uint64 = 60 * 60 * 24
-	uptimeValues["days"] = remainingUptime / secondsInADay
-	remainingUptime = remainingUptime - (uptimeValues["days"] * secondsInADay)
+	values.years, remaining = remaining/secondsInAYear, remaining%secondsInAYear
+	values.months, remaining = remaining/secondsInAMonth, remaining%secondsInAMonth
+	values.days, remaining = remaining/secondsInADay, remaining%secondsInADay
+	values.hours, remaining = remaining/secondsInAnHour, remaining%secondsInAnHour
+	values.minutes, values.seconds = remaining/secondsInAMinute, remaining%secondsInAMinute
 
-	var secondsInAnHour uint64 = 60 * 60
-	uptimeValues["hours"] = remainingUptime / secondsInAnHour
-	remainingUptime = remainingUptime - (uptimeValues["hours"] * secondsInAnHour)
-
-	var secondsInAMinute uint64 = 60
-	uptimeValues["minutes"] = remainingUptime / secondsInAMinute
-	remainingUptime = remainingUptime - (uptimeValues["minutes"] * secondsInAMinute)
-
-	uptimeValues["seconds"] = remainingUptime
-
-	return uptimeValues
+	return values
 }

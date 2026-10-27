@@ -1,9 +1,13 @@
 package plugins
 
 import (
-	. "github.com/gdubicki/dynamotd/dynamotd"
+	"github.com/gdubicki/dynamotd/dynamotd"
 )
 
-func EmptyLine() Row {
-	return *new(Row)
+func init() {
+	dynamotd.Register(EmptyLine, "", "emptyLine")
+}
+
+func EmptyLine() dynamotd.Row {
+	return dynamotd.Row{}
 }
