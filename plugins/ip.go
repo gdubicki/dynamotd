@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -46,7 +47,7 @@ func getLocalIP() (string, error) {
 	// this does not really make the connection
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		return "", err
+		return "", errors.New("no default route")
 	}
 	defer func() { _ = conn.Close() }()
 
@@ -68,11 +69,8 @@ func getExternalIP(ctx context.Context) (string, error) {
 		return "", err
 	}
 	resp, err := http.DefaultClient.Do(req)
-	if errors.Is(err, context.DeadlineExceeded) {
-		return "", fmt.Errorf("timed out")
-	}
 	if err != nil {
-		return "", fmt.Errorf("no internet connection")
+		return "", describeHTTPError(err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
@@ -85,4 +83,23 @@ func getExternalIP(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("check internet connection")
 	}
 	return strings.TrimSpace(string(body)), nil
+}
+
+// describeHTTPError returns a short, human-readable reason for a failed HTTP request.
+func describeHTTPError(err error) error {
+	var dnsErr *net.DNSError
+	var certErr *tls.CertificateVerificationError
+	var opErr *net.OpError
+	switch {
+	case errors.Is(err, context.DeadlineExceeded):
+		return fmt.Errorf("timed out")
+	case errors.As(err, &dnsErr):
+		return fmt.Errorf("can't resolve %s", dnsErr.Name)
+	case errors.As(err, &certErr):
+		return fmt.Errorf("TLS certificate verification failed - missing CA certificates?")
+	case errors.As(err, &opErr):
+		return fmt.Errorf("no internet connection")
+	default:
+		return err
+	}
 }
