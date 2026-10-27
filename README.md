@@ -88,9 +88,23 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 | `topprocesses` | The processes using the most CPU - only if the load is high, and the ones using the most RAM - only if its usage is high | `load: 0.9` - per CPU core, `memory: 90` - in %, `count: 3` - number of processes, `always: false` - to show them always |
 | `diskspace` | Disk space usage of `/`, and of any other writable filesystem that reached the warning threshold for space or inodes. Inodes usage is shown only if it reached its warning threshold. | `warning: 75`, `critical: 90` - in % of space used, `inodes: {warning: 75, critical: 90}` - in % of inodes used, `always: ["/"]` - filesystems always shown, `others: true` - whether to show the other filesystems |
 | `failedunits` | Failed systemd units - only if there are any | - |
+| `command` | First line of the output of a custom command, see below | `label` and `run` - both required |
 | empty or `emptyLine` | Empty line | - |
 
 Check out all the available command-line arguments by running `dynamotd -help`.
+
+### Custom commands
+
+To show the output of any command, use the `command` row type, f.e.:
+```yaml
+rows:
+  - command:
+      label: Containers
+      run: docker ps -q | wc -l
+```
+The command is run with `/bin/sh` and the first line of its output is shown. Its exit code determines the color, like for the [Nagios plugins](https://nagios-plugins.org/doc/guidelines.html#AEN78), so you can use them as is: 0 - normal, 1 - warning (yellow), 2 and other - critical (red). Commands that don't finish within the `timeout` are killed and shown as "timed out".
+
+As the commands are run as the user running dynamotd, usually root, the config file with them must be owned by root (or that user) and not writable by group or others.
 
 ## Contributing
 
@@ -123,7 +137,6 @@ Optional, but recommended: use [pre-commit](https://pre-commit.com) and install 
 
 These features ~~will~~ may be implemented in the future:
 
-* **Pluggable** - add custom lines with any label and any command(s) output as the value,
 * **Interactive mode** - show the output like `htop`, updated every 2 seconds,
 * **Keyboard shortcuts** - in interactive mode only, to run popular tools like htop, iftop etc.
 * **Circuit-breaker** - minimal info mode in case of server overload detection,

@@ -8,9 +8,11 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/gdubicki/dynamotd/dynamotd"
+	"github.com/gdubicki/dynamotd/plugins"
 	"gopkg.in/yaml.v3"
 )
 
@@ -73,24 +75,58 @@ func configPaths() []string {
 // in the default locations. The config file is optional - the defaults are enough to run this app.
 func loadConfig(path string) (config, error) {
 	if path != "" {
-		data, err := os.ReadFile(path)
-		if err != nil {
-			return config{}, err
-		}
-		return parseConfig(data, path)
+		return readConfigFile(path)
 	}
 
 	for _, path := range configPaths() {
-		data, err := os.ReadFile(path)
+		cfg, err := readConfigFile(path)
 		if errors.Is(err, fs.ErrNotExist) {
 			continue
 		}
-		if err != nil {
-			return config{}, err
-		}
-		return parseConfig(data, path)
+		return cfg, err
 	}
 	return defaultConfig(), nil
+}
+
+func readConfigFile(path string) (config, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return config{}, err
+	}
+	cfg, err := parseConfig(data, path)
+	if err != nil {
+		return config{}, err
+	}
+
+	for _, row := range cfg.Rows {
+		if row.Name == plugins.CommandRowType {
+			if err := checkConfigFileIsSecure(path); err != nil {
+				return config{}, err
+			}
+			break
+		}
+	}
+	return cfg, nil
+}
+
+// checkConfigFileIsSecure checks if the config file can only be changed by root or the current user,
+// as the commands in it are run as the user running this app, which is usually root.
+func checkConfigFileIsSecure(path string) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return fmt.Errorf("can't check the owner of the config file %s", path)
+	}
+	if stat.Uid != 0 && int(stat.Uid) != os.Geteuid() {
+		return fmt.Errorf("config file %s has %s rows, so it must be owned by root or the current user", path, plugins.CommandRowType)
+	}
+	if info.Mode().Perm()&0o022 != 0 {
+		return fmt.Errorf("config file %s has %s rows, so it must not be writable by group or others", path, plugins.CommandRowType)
+	}
+	return nil
 }
 
 func parseConfig(data []byte, path string) (config, error) {

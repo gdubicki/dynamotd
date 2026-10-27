@@ -113,3 +113,28 @@ func TestParseConfigInvalidRow(t *testing.T) {
 	_, err := parseConfig([]byte("rows:\n  - timestamp\n  - memory: {}\n    load: {}\n"), "test.yaml")
 	assert.ErrorContains(t, err, "error in config file test.yaml, line 3: a row should be")
 }
+
+func TestCommandRowsRequireSecureConfigFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "dynamotd.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("rows:\n  - command:\n      label: X\n      run: id\n"), 0o644))
+
+	_, err := loadConfig(path)
+	require.NoError(t, err)
+
+	require.NoError(t, os.Chmod(path, 0o664))
+	_, err = loadConfig(path)
+	assert.ErrorContains(t, err, "has command rows, so it must not be writable by group or others")
+
+	require.NoError(t, os.Chmod(path, 0o646))
+	_, err = loadConfig(path)
+	assert.ErrorContains(t, err, "must not be writable by group or others")
+}
+
+func TestOtherRowsDontRequireSecureConfigFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "dynamotd.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("rows: [fqdn]\n"), 0o666))
+	require.NoError(t, os.Chmod(path, 0o666))
+
+	_, err := loadConfig(path)
+	assert.NoError(t, err)
+}

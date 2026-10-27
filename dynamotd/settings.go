@@ -39,6 +39,11 @@ func decodeSettings[S any](defaults S, settingsNode *yaml.Node) (S, error) {
 	return settings, nil
 }
 
+// Labeler is implemented by the settings that define the row's label.
+type Labeler interface {
+	RowLabel() string
+}
+
 // Thresholds define when a value is shown as a warning or as critical.
 type Thresholds struct {
 	Warning  float64 `yaml:"warning"`

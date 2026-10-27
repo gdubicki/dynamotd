@@ -6,6 +6,10 @@
 #   - memory:
 #       warning: 80
 #       critical: 90
+# to show the output of a custom command:
+#   - command:
+#       label: Containers
+#       run: docker ps -q | wc -l
 # see the README for all the row types and their settings
 rows:
   - timestamp

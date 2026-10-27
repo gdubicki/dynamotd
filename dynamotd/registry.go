@@ -36,15 +36,19 @@ var registry = map[string]newRowType{}
 //
 // The settings for generate are the defaults, overridden with the ones from the config file,
 // so they should be a struct with yaml tags (NoSettings if there are none). If it implements
-// Validator, then it's used to validate them.
+// Validator, then it's used to validate them. If it implements Labeler, then it overrides the label.
 func Register[S any](label string, defaults S, generate func(ctx context.Context, settings S) []Row, names ...string) {
 	newRowType := func(settingsNode *yaml.Node) (RowType, error) {
 		settings, err := decodeSettings(defaults, settingsNode)
 		if err != nil {
 			return RowType{}, err
 		}
+		rowLabel := label
+		if labeler, ok := any(settings).(Labeler); ok {
+			rowLabel = labeler.RowLabel()
+		}
 		return RowType{
-			Label:    label,
+			Label:    rowLabel,
 			Generate: func(ctx context.Context) []Row { return generate(ctx, settings) },
 		}, nil
 	}
