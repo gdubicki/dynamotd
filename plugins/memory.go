@@ -1,12 +1,8 @@
 package plugins
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/Tonyfilla/go-humanize"
 	"github.com/gdubicki/dynamotd/dynamotd"
@@ -42,10 +38,8 @@ const memoryLabel = "Memory"
 // for mocking in tests
 var getVirtualMemory = mem.VirtualMemoryWithContext
 var getSwap = mem.SwapMemoryWithContext
-var vmstatPath = "/proc/vmstat"
 
-// Memory shows the RAM usage, the swap usage if there is any swap, and the number of processes killed
-// by the OOM killer since boot with the time of the last kill, if there were any.
+// Memory shows the RAM usage, and the swap usage if there is any swap.
 func Memory(ctx context.Context, settings memorySettings) []dynamotd.Row {
 	memoryStat, err := getVirtualMemory(ctx)
 	if err != nil {
@@ -81,34 +75,8 @@ func Memory(ctx context.Context, settings memorySettings) []dynamotd.Row {
 		)
 	}
 
-	// it's not available on macOS and old Linux kernels
-	if oomKills, err := getOOMKills(); err == nil && oomKills > 0 {
-		value = append(value, dynamotd.ValueDescription(", "))
-		value = append(value, oomKillsValue(oomKills)...)
-	}
-
 	return []dynamotd.Row{{
 		Label: dynamotd.SingleColorLabel(memoryLabel),
 		Value: dynamotd.ToColorText(value...),
 	}}
-}
-
-// getOOMKills returns the number of processes killed by the OOM killer since boot.
-func getOOMKills() (uint64, error) {
-	file, err := os.Open(vmstatPath)
-	if err != nil {
-		return 0, err
-	}
-	defer func() { _ = file.Close() }()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		if value, found := strings.CutPrefix(scanner.Text(), "oom_kill "); found {
-			return strconv.ParseUint(value, 10, 64)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return 0, err
-	}
-	return 0, fmt.Errorf("no oom_kill in %s", vmstatPath)
 }

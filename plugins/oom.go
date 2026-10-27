@@ -1,7 +1,10 @@
 package plugins
 
 import (
+	"bufio"
+	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -10,6 +13,12 @@ import (
 	"github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/shirou/gopsutil/v4/host"
 )
+
+func init() {
+	dynamotd.Register(oomKillsLabel, dynamotd.NoSettings{}, OOMKills, "oomkills")
+}
+
+const oomKillsLabel = "OOM kills"
 
 // OOM kills more recent than this are shown as critical, older ones as warnings,
 // as they have likely already been dealt with
@@ -29,6 +38,7 @@ type lastOOMKillInfo struct {
 }
 
 // for mocking in tests
+var vmstatPath = "/proc/vmstat"
 var readKernelLog = readKmsg
 var getBootTime = host.BootTime
 var now = time.Now
@@ -92,13 +102,14 @@ func kmsgRecordTime(header string, bootTime time.Time) (time.Time, bool) {
 	return bootTime.Add(time.Duration(sinceBoot) * time.Microsecond), true
 }
 
-// oomKillsValue describes the OOM kills since boot, f.e.
-// "3 OOM kills since boot, last 2 days ago (java, 2026-10-25 14:03)", or if the last kill is no longer
-// in the kernel log: "3 OOM kills since boot, last over 1 day ago (before 2026-10-26 10:56)"
-func oomKillsValue(count uint64) []dynamotd.ColorString {
-	unit := "OOM kill"
-	if count > 1 {
-		unit += "s"
+// OOMKills shows the number of processes killed by the OOM killer since boot, if there were any,
+// and when the last one was killed, f.e. "3 since boot, last 2 days ago (java, 2026-10-25 14:03)",
+// or if it's no longer in the kernel log: "3 since boot, last over 1 day ago (before 2026-10-26 10:56)".
+func OOMKills(_ context.Context, _ dynamotd.NoSettings) []dynamotd.Row {
+	// it's not available on macOS and old Linux kernels
+	count, err := getOOMKills()
+	if err != nil || count == 0 {
+		return nil
 	}
 
 	last, found := lastOOMKill()
@@ -110,30 +121,34 @@ func oomKillsValue(count uint64) []dynamotd.ColorString {
 		lastTime = last.before
 	}
 
-	countColor := dynamotd.ValueCriticalColor
+	color := dynamotd.ValueCriticalColor
 	if found && now().Sub(lastTime) > recentOOMKill {
-		countColor = dynamotd.ValueWarningColor
+		color = dynamotd.ValueWarningColor
 	}
 
 	value := []dynamotd.ColorString{
-		{Color: countColor, Text: fmt.Sprintf("%d %s", count, unit)},
+		{Color: color, Text: fmt.Sprintf("%d", count)},
 		dynamotd.ValueDescription(" since boot"),
 	}
 	switch {
 	case found && last.kill != nil:
 		value = append(value,
 			dynamotd.ValueDescription(", last "),
-			dynamotd.ColorString{Color: countColor, Text: ago(now().Sub(lastTime))},
+			dynamotd.ColorString{Color: color, Text: ago(now().Sub(lastTime))},
 			dynamotd.ValueDescription(fmt.Sprintf(" (%s, %s)", last.kill.process, formatOOMTime(lastTime))),
 		)
 	case found:
 		value = append(value,
 			dynamotd.ValueDescription(", last "),
-			dynamotd.ColorString{Color: countColor, Text: "over " + ago(now().Sub(lastTime))},
+			dynamotd.ColorString{Color: color, Text: "over " + ago(now().Sub(lastTime))},
 			dynamotd.ValueDescription(fmt.Sprintf(" (before %s)", formatOOMTime(lastTime))),
 		)
 	}
-	return value
+
+	return []dynamotd.Row{{
+		Label: dynamotd.SingleColorLabel(oomKillsLabel),
+		Value: dynamotd.ToColorText(value...),
+	}}
 }
 
 func formatOOMTime(t time.Time) string {
@@ -158,4 +173,24 @@ func ago(duration time.Duration) string {
 	default:
 		return plural(int(duration.Hours()/24), "day")
 	}
+}
+
+// getOOMKills returns the number of processes killed by the OOM killer since boot.
+func getOOMKills() (uint64, error) {
+	file, err := os.Open(vmstatPath)
+	if err != nil {
+		return 0, err
+	}
+	defer func() { _ = file.Close() }()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if value, found := strings.CutPrefix(scanner.Text(), "oom_kill "); found {
+			return strconv.ParseUint(value, 10, 64)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return 0, err
+	}
+	return 0, fmt.Errorf("no oom_kill in %s", vmstatPath)
 }

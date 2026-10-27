@@ -26,6 +26,7 @@ rows:
   - cpu
   - topprocesses
   - memory
+  - oomkills
   - diskspace
   -
   - failedunits

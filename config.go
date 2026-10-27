@@ -35,6 +35,7 @@ var defaultRows = rowConfigs(
 	"cpu",
 	"topprocesses",
 	"memory",
+	"oomkills",
 	"diskspace",
 	"",
 	"failedunits",

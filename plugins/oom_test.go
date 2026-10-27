@@ -1,7 +1,10 @@
 package plugins
 
 import (
+	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -58,7 +61,27 @@ func TestFindLastOOMKill(t *testing.T) {
 	assert.False(t, found)
 }
 
-func TestOOMKillsValue(t *testing.T) {
+// mockVmstat mocks /proc/vmstat, or makes it missing (like on macOS) if vmstat is empty
+func mockVmstat(t *testing.T, vmstat string) {
+	orig := vmstatPath
+	t.Cleanup(func() { vmstatPath = orig })
+
+	vmstatPath = filepath.Join(t.TempDir(), "vmstat")
+	if vmstat != "" {
+		require.NoError(t, os.WriteFile(vmstatPath, []byte(vmstat), 0o644))
+	}
+}
+
+func TestOOMKillsNotShown(t *testing.T) {
+	mockKernelLog(t, kernelLogWithOOMKills)
+
+	for _, vmstat := range []string{"", "nr_free_pages 1\noom_kill 0\n", "nr_free_pages 1\n"} {
+		mockVmstat(t, vmstat)
+		assert.Empty(t, OOMKills(context.Background(), dynamotd.NoSettings{}), vmstat)
+	}
+}
+
+func TestOOMKills(t *testing.T) {
 	lastKill := testBootTime.Add(48 * time.Hour)
 	oldestRecord := testBootTime.Add(172900 * time.Second)
 
@@ -70,31 +93,34 @@ func TestOOMKillsValue(t *testing.T) {
 		color    string
 	}{
 		{"recent", kernelLogWithOOMKills, lastKill.Add(3 * time.Hour),
-			"2 OOM kills since boot, last 3 hours ago (postgres, " + lastKill.Format("2006-01-02 15:04") + ")", "critical"},
+			"2 since boot, last 3 hours ago (postgres, " + lastKill.Format("2006-01-02 15:04") + ")", "critical"},
 		{"old", kernelLogWithOOMKills, lastKill.Add(50 * time.Hour),
-			"2 OOM kills since boot, last 2 days ago (postgres, " + lastKill.Format("2006-01-02 15:04") + ")", "warning"},
+			"2 since boot, last 2 days ago (postgres, " + lastKill.Format("2006-01-02 15:04") + ")", "warning"},
 		{"kernel log not readable", nil, lastKill,
-			"2 OOM kills since boot", "critical"},
+			"2 since boot", "critical"},
 		{"no longer in the kernel log, which starts over 24h ago", kernelLogWithOOMKills[4:], lastKill.Add(30 * time.Hour),
-			"2 OOM kills since boot, last over 29 hours ago (before " + oldestRecord.Format("2006-01-02 15:04") + ")", "warning"},
+			"2 since boot, last over 29 hours ago (before " + oldestRecord.Format("2006-01-02 15:04") + ")", "warning"},
 		{"no longer in the kernel log, which starts within 24h", kernelLogWithOOMKills[4:], lastKill.Add(3 * time.Hour),
-			"2 OOM kills since boot, last over 2 hours ago (before " + oldestRecord.Format("2006-01-02 15:04") + ")", "critical"},
+			"2 since boot, last over 2 hours ago (before " + oldestRecord.Format("2006-01-02 15:04") + ")", "critical"},
 		{"empty kernel log", []string{}, lastKill,
-			"2 OOM kills since boot", "critical"},
+			"2 since boot", "critical"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mockVmstat(t, "nr_free_pages 1\noom_kill 2\nnr_foo 5\n")
 			mockKernelLog(t, tt.records)
 			setNow(t, tt.now)
 
-			value := dynamotd.ToColorText(oomKillsValue(2)...)
+			rows := OOMKills(context.Background(), dynamotd.NoSettings{})
 
-			assert.Equal(t, tt.expected, value.String())
+			require.Len(t, rows, 1)
+			assert.Equal(t, oomKillsLabel, rows[0].Label.String())
+			assert.Equal(t, tt.expected, rows[0].Value.String())
 			expectedColor := dynamotd.ValueCriticalColor
 			if tt.color == "warning" {
 				expectedColor = dynamotd.ValueWarningColor
 			}
-			assert.Equal(t, expectedColor, value.Parts()[0].Color)
+			assert.Equal(t, expectedColor, rows[0].Value.Parts()[0].Color)
 		})
 	}
 }

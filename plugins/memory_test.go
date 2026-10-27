@@ -2,8 +2,6 @@ package plugins
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/gdubicki/dynamotd/dynamotd"
@@ -14,17 +12,12 @@ import (
 
 const gib = 1024 * 1024 * 1024
 
-func mockMemory(t *testing.T, memory mem.VirtualMemoryStat, swap mem.SwapMemoryStat, vmstat string) {
-	origMemory, origSwap, origPath := getVirtualMemory, getSwap, vmstatPath
-	t.Cleanup(func() { getVirtualMemory, getSwap, vmstatPath = origMemory, origSwap, origPath })
-	mockKernelLog(t, nil)
+func mockMemory(t *testing.T, memory mem.VirtualMemoryStat, swap mem.SwapMemoryStat) {
+	origMemory, origSwap := getVirtualMemory, getSwap
+	t.Cleanup(func() { getVirtualMemory, getSwap = origMemory, origSwap })
 
 	getVirtualMemory = func(context.Context) (*mem.VirtualMemoryStat, error) { return &memory, nil }
 	getSwap = func(context.Context) (*mem.SwapMemoryStat, error) { return &swap, nil }
-	vmstatPath = filepath.Join(t.TempDir(), "vmstat")
-	if vmstat != "" {
-		require.NoError(t, os.WriteFile(vmstatPath, []byte(vmstat), 0o644))
-	}
 }
 
 var defaultMemorySettings = memorySettings{
@@ -38,21 +31,15 @@ func TestMemory(t *testing.T) {
 	tests := []struct {
 		name     string
 		swap     mem.SwapMemoryStat
-		vmstat   string
 		expected string
 	}{
-		{"no swap, no vmstat (macOS)", mem.SwapMemoryStat{}, "",
-			"4 GiB of 16 GiB RAM used (25%)"},
-		{"swap, no OOM kills", mem.SwapMemoryStat{Total: 2 * gib, Used: gib / 2, UsedPercent: 25}, "nr_free_pages 1\noom_kill 0\n",
+		{"no swap", mem.SwapMemoryStat{}, "4 GiB of 16 GiB RAM used (25%)"},
+		{"swap", mem.SwapMemoryStat{Total: 2 * gib, Used: gib / 2, UsedPercent: 25},
 			"4 GiB of 16 GiB RAM used (25%), 512 MiB of 2 GiB swap (25%)"},
-		{"swap and OOM kills", mem.SwapMemoryStat{Total: 2 * gib, Used: gib + gib/2, UsedPercent: 75}, "oom_kill 3\nnr_foo 5\n",
-			"4 GiB of 16 GiB RAM used (25%), 1.5 GiB of 2 GiB swap (75%), 3 OOM kills since boot"},
-		{"no swap, one OOM kill", mem.SwapMemoryStat{}, "oom_kill 1\n",
-			"4 GiB of 16 GiB RAM used (25%), 1 OOM kill since boot"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockMemory(t, ram, tt.swap, tt.vmstat)
+			mockMemory(t, ram, tt.swap)
 
 			rows := Memory(context.Background(), defaultMemorySettings)
 
@@ -64,7 +51,7 @@ func TestMemory(t *testing.T) {
 
 func TestMemoryColors(t *testing.T) {
 	mockMemory(t, mem.VirtualMemoryStat{Total: 100 * gib, Available: 8 * gib},
-		mem.SwapMemoryStat{Total: 2 * gib, Used: gib + gib/2, UsedPercent: 75}, "")
+		mem.SwapMemoryStat{Total: 2 * gib, Used: gib + gib/2, UsedPercent: 75})
 
 	parts := Memory(context.Background(), defaultMemorySettings)[0].Value.Parts()
 
