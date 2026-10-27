@@ -58,6 +58,8 @@ TODO: expand this section as more cases are identified.
 
 See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
+After changing the config, check it with `dynamotd -check`.
+
 Check out all the available command-line arguments by running `dynamotd -help`.
 
 ## Contributing

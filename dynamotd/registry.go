@@ -3,6 +3,8 @@ package dynamotd
 import (
 	"context"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
 )
 
@@ -34,11 +36,23 @@ func Lookup(names []string) ([]RowType, error) {
 	for _, name := range names {
 		rowType, ok := registry[name]
 		if !ok {
-			return nil, fmt.Errorf("unknown row type '%s' - check for typos", name)
+			return nil, fmt.Errorf("unknown row type '%s' - available ones are: %s", name, strings.Join(Names(), ", "))
 		}
 		rowTypes = append(rowTypes, rowType)
 	}
 	return rowTypes, nil
+}
+
+// Names returns the names of all the registered row types, except the empty line's empty name.
+func Names() []string {
+	var names []string
+	for name := range registry {
+		if name != "" {
+			names = append(names, name)
+		}
+	}
+	slices.Sort(names)
+	return names
 }
 
 // how long to wait after the timeout for the row types that return partial info when their context is done

@@ -37,6 +37,7 @@ func TestExampleConfigMatchesDefaults(t *testing.T) {
 	require.NoError(t, err)
 	cfg, err := parseConfig(data, configFileName)
 	require.NoError(t, err)
+	cfg.Path = ""
 	assert.Equal(t, defaultConfig(), cfg)
 }
 
@@ -62,6 +63,8 @@ func TestParseConfigUnknownKey(t *testing.T) {
 func TestParseConfigEmptyFile(t *testing.T) {
 	cfg, err := parseConfig([]byte(""), "test.yaml")
 	require.NoError(t, err)
+	assert.Equal(t, "test.yaml", cfg.Path)
+	cfg.Path = ""
 	assert.Equal(t, defaultConfig(), cfg)
 }
 
@@ -78,6 +81,7 @@ func TestLoadConfigFromPath(t *testing.T) {
 	cfg, err := loadConfig(path)
 	require.NoError(t, err)
 	assert.Equal(t, []string{"fqdn"}, cfg.Rows)
+	assert.Equal(t, path, cfg.Path)
 
 	_, err = loadConfig(filepath.Join(t.TempDir(), "missing.yaml"))
 	assert.ErrorIs(t, err, fs.ErrNotExist)

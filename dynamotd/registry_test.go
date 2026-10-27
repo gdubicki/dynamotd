@@ -11,7 +11,7 @@ import (
 
 func TestLookupUnknown(t *testing.T) {
 	_, err := Lookup([]string{"no-such-row"})
-	assert.ErrorContains(t, err, "unknown row type 'no-such-row'")
+	assert.ErrorContains(t, err, "unknown row type 'no-such-row' - available ones are: ")
 }
 
 func rowType(label string, generate func(ctx context.Context) []Row) RowType {

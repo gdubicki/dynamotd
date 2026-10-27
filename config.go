@@ -33,6 +33,8 @@ var defaultRows = []string{
 const defaultTimeout = 1 * time.Second
 
 type config struct {
+	// Path is the config file used, empty if none
+	Path    string
 	Rows    []string
 	Timeout time.Duration
 }
@@ -89,6 +91,7 @@ func parseConfig(data []byte, path string) (config, error) {
 	}
 
 	cfg := defaultConfig()
+	cfg.Path = path
 
 	if raw.Timeout != nil {
 		if *raw.Timeout <= 0 {

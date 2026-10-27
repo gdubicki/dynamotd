@@ -18,6 +18,7 @@ func main() {
 	var flagForceColor = flag.Bool("force-color", false, "Force color output")
 	var flagNoColor = flag.Bool("no-color", false, "Disable color output")
 	var flagVersion = flag.Bool("version", false, "Print version and exit")
+	var flagCheck = flag.Bool("check", false, "Check the config file and exit")
 	var flagConfig = flag.String("config", "", "Path to the config file (default: first of "+strings.Join(configPaths(), ", ")+")")
 
 	flag.Parse()
@@ -33,13 +34,13 @@ func main() {
 		color.NoColor = false
 	}
 
-	if err := run(*flagConfig); err != nil {
+	if err := run(*flagConfig, *flagCheck); err != nil {
 		fmt.Fprintf(os.Stderr, "dynamotd: %s\n", err)
 		os.Exit(1)
 	}
 }
 
-func run(configPath string) error {
+func run(configPath string, checkOnly bool) error {
 	cfg, err := loadConfig(configPath)
 	if err != nil {
 		return err
@@ -48,6 +49,15 @@ func run(configPath string) error {
 	rowTypes, err := dynamotd.Lookup(cfg.Rows)
 	if err != nil {
 		return err
+	}
+
+	if checkOnly {
+		if cfg.Path == "" {
+			fmt.Println("No config file found, the defaults are OK.")
+		} else {
+			fmt.Printf("Config file %s is OK.\n", cfg.Path)
+		}
+		return nil
 	}
 
 	dynamotd.Print(dynamotd.Generate(rowTypes, cfg.Timeout))
