@@ -7,9 +7,15 @@ This app provides a [MOTD (Message Of The Day)](https://en.wikipedia.org/wiki/Mo
 providing the info about your server that YOU need to troubleshoot stuff when you SSH to it (because if you are doing
 it, then something IS wrong with the server, isn't it?).   
 
-## Screenshot 
+## Screenshots
 
-<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/dynamotd.png" width="1000px" alt="screenshot">
+When all is good, it shows the basic info about your server:
+
+<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/screenshot-all-good.png" width="923px" alt="screenshot of a server without problems">
+
+When there are problems, they are shown in yellow and red, and some rows appear only then:
+
+<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/screenshot-all-problems.png" width="1000px" alt="screenshot of a server with all kinds of problems">
 
 ## Features
 
@@ -135,6 +141,11 @@ golangci-lint run
 ```
 
 How to add a new row type: create a file in [plugins/](./plugins) with a function returning a `dynamotd.Row` and register it under a name (to be used in the config file) in an `init()` function - see the existing plugins.
+
+How to regenerate the screenshots above after changing the output (requires ImageMagick, pngquant and the Monaco font, included in macOS):
+```
+tools/screenshots/generate.sh
+```
 
 How to release: push a `v*` tag. GitHub Actions will build the binaries and packages and create a draft release.
 
