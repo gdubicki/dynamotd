@@ -80,7 +80,7 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 | `cores` | Number of CPU cores and their clock speed | - |
 | `load` | Load averages and number of CPU cores | `warning: 0.9`, `critical: 1.1` - per CPU core |
 | `memory` | RAM usage | `warning: 90`, `critical: 95` - in % |
-| `diskspace` | Disk space usage of `/` | `warning: 75`, `critical: 90` - in % |
+| `diskspace` | Disk space usage of `/`, and of any other writable filesystem that reached the warning threshold for space or inodes. Inodes usage is shown only if it reached its warning threshold. | `warning: 75`, `critical: 90` - in % of space used, `inodes: {warning: 75, critical: 90}` - in % of inodes used, `always: ["/"]` - filesystems always shown, `others: true` - whether to show the other filesystems |
 | empty or `emptyLine` | Empty line | - |
 
 Check out all the available command-line arguments by running `dynamotd -help`.

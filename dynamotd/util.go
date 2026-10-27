@@ -89,6 +89,11 @@ func (row Row) isEmptyLine() bool {
 	return len(row.Label.text) == 0 && len(row.Value.text) == 0
 }
 
+// Parts returns the parts of the text, each in its own color.
+func (colorText ColorText) Parts() []ColorString {
+	return colorText.text
+}
+
 // String returns the text without any colors.
 func (colorText ColorText) String() string {
 	result := ""
