@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	dynamotd.Register(Memory, "memory")
+	dynamotd.Register(dynamotd.RowType{Label: memoryLabel, Generate: dynamotd.SingleRow(Memory)}, "memory")
 }
 
 const memoryLabel = "RAM"

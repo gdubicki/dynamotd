@@ -12,3 +12,7 @@ rows:
   - load
   - memory
   - diskspace
+
+# rows that don't finish within this time are shown as "timed out",
+# so that f.e. a broken DNS doesn't block your login
+timeout: 1s

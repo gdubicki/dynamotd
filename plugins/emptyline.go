@@ -5,7 +5,7 @@ import (
 )
 
 func init() {
-	dynamotd.Register(EmptyLine, "", "emptyLine")
+	dynamotd.Register(dynamotd.RowType{Label: "", Generate: dynamotd.SingleRow(EmptyLine)}, "", "emptyLine")
 }
 
 func EmptyLine() dynamotd.Row {

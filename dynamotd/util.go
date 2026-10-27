@@ -89,6 +89,14 @@ func ErrorRow(label string, err error) Row {
 	}
 }
 
+// TimedOutRow is shown for a row type that didn't generate its rows in time.
+func TimedOutRow(label string) Row {
+	return Row{
+		Label: SingleColorLabel(label),
+		Value: ToColorText(ValueWarning("timed out")),
+	}
+}
+
 func (row Row) isEmptyLine() bool {
 	return len(row.Label.text) == 0 && len(row.Value.text) == 0
 }

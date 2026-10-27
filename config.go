@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -26,8 +29,16 @@ var defaultRows = []string{
 	"diskspace",
 }
 
+// the rows that don't finish in this time are shown as timed out, so that a login is never blocked for long
+const defaultTimeout = 1 * time.Second
+
 type config struct {
-	Rows []string `yaml:"rows"`
+	Rows    []string
+	Timeout time.Duration
+}
+
+func defaultConfig() config {
+	return config{Rows: defaultRows, Timeout: defaultTimeout}
 }
 
 // configPaths returns the locations of the config file, in the order they are searched.
@@ -52,21 +63,34 @@ func loadConfig() (config, error) {
 		}
 		return parseConfig(data, path)
 	}
-	return config{Rows: defaultRows}, nil
+	return defaultConfig(), nil
 }
 
 func parseConfig(data []byte, path string) (config, error) {
 	var raw struct {
 		// pointers, as otherwise the empty (null) elements, used for empty lines, would be skipped
-		Rows *[]*string `yaml:"rows"`
+		Rows    *[]*string     `yaml:"rows"`
+		Timeout *time.Duration `yaml:"timeout"`
 	}
-	if err := yaml.Unmarshal(data, &raw); err != nil {
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	// report typos in the keys
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&raw); err != nil && !errors.Is(err, io.EOF) {
 		return config{}, fmt.Errorf("error in config file %s: %w", path, err)
+	}
+
+	cfg := defaultConfig()
+
+	if raw.Timeout != nil {
+		if *raw.Timeout <= 0 {
+			return config{}, fmt.Errorf("error in config file %s: timeout must be positive", path)
+		}
+		cfg.Timeout = *raw.Timeout
 	}
 
 	// nil means no "rows" key at all, so use the defaults
 	if raw.Rows == nil {
-		return config{Rows: defaultRows}, nil
+		return cfg, nil
 	}
 
 	rows := make([]string, 0, len(*raw.Rows))
@@ -84,5 +108,6 @@ func parseConfig(data []byte, path string) (config, error) {
 	if len(rows) > maxRows {
 		return config{}, fmt.Errorf("error in config file %s: more rows than %d not supported", path, maxRows)
 	}
-	return config{Rows: rows}, nil
+	cfg.Rows = rows
+	return cfg, nil
 }

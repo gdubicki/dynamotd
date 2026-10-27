@@ -9,7 +9,10 @@ import (
 )
 
 func init() {
-	dynamotd.Register(func() dynamotd.Row { return DiskSpace("/") }, "diskspace")
+	dynamotd.Register(dynamotd.RowType{
+		Label:    "Disk space (/)",
+		Generate: dynamotd.SingleRow(func() dynamotd.Row { return DiskSpace("/") }),
+	}, "diskspace")
 }
 
 func DiskSpace(path string) dynamotd.Row {

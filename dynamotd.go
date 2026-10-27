@@ -43,11 +43,11 @@ func run() error {
 		return err
 	}
 
-	rowFuncs, err := dynamotd.Lookup(cfg.Rows)
+	rowTypes, err := dynamotd.Lookup(cfg.Rows)
 	if err != nil {
 		return err
 	}
 
-	dynamotd.Print(dynamotd.Generate(rowFuncs))
+	dynamotd.Print(dynamotd.Generate(rowTypes, cfg.Timeout))
 	return nil
 }

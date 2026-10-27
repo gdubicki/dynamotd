@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	dynamotd.Register(Load, "load")
+	dynamotd.Register(dynamotd.RowType{Label: loadLabel, Generate: dynamotd.SingleRow(Load)}, "load")
 }
 
 const loadLabel = "CPU Load (1/5/15)"

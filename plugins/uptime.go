@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	dynamotd.Register(Uptime, "uptime")
+	dynamotd.Register(dynamotd.RowType{Label: uptimeLabel, Generate: dynamotd.SingleRow(Uptime)}, "uptime")
 }
 
 const uptimeLabel = "Uptime"

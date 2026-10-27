@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	dynamotd.Register(Cores, "cores")
+	dynamotd.Register(dynamotd.RowType{Label: coresLabel, Generate: dynamotd.SingleRow(Cores)}, "cores")
 }
 
 const coresLabel = "CPU"

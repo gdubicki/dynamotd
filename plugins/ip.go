@@ -1,27 +1,33 @@
 package plugins
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/gdubicki/dynamotd/dynamotd"
 )
 
 func init() {
-	dynamotd.Register(Ip, "ip")
+	dynamotd.Register(dynamotd.RowType{
+		Label:    ipLabel,
+		Generate: func(ctx context.Context) []dynamotd.Row { return []dynamotd.Row{Ip(ctx)} },
+	}, "ip")
 }
 
-func Ip() dynamotd.Row {
+const ipLabel = "IP"
+
+func Ip(ctx context.Context) dynamotd.Row {
 	return dynamotd.Row{
-		Label: dynamotd.SingleColorLabel("IP"),
+		Label: dynamotd.SingleColorLabel(ipLabel),
 		Value: dynamotd.ToColorText(
 			ipColorString(getLocalIP()),
 			dynamotd.ValueDescription(" (external: "),
-			ipColorString(getExternalIP()),
+			ipColorString(getExternalIP(ctx)),
 			dynamotd.ValueDescription(")"),
 		),
 	}
@@ -51,17 +57,22 @@ func getLocalIP() (string, error) {
 
 var showFakeIP = false
 
-func getExternalIP() (string, error) {
+func getExternalIP(ctx context.Context) (string, error) {
 	if showFakeIP {
 		return "123.123.123.123", nil
 	}
 
-	client := http.Client{
-		Timeout: 3 * time.Second,
-	}
-	resp, err := client.Get("https://icanhazip.com")
+	// the overall timeout is in the context
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://icanhazip.com", nil)
 	if err != nil {
-		return "", fmt.Errorf("no or too slow internet connection")
+		return "", err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if errors.Is(err, context.DeadlineExceeded) {
+		return "", fmt.Errorf("timed out")
+	}
+	if err != nil {
+		return "", fmt.Errorf("no internet connection")
 	}
 	defer func() { _ = resp.Body.Close() }()
 
