@@ -159,11 +159,6 @@ These features ~~will~~ may be implemented in the future:
 * **Keyboard shortcuts** - in interactive mode only, to run popular tools like htop, iftop etc.
 * **Circuit-breaker** - minimal info mode in case of server overload detection.
 
-We also don't have user docs, developer docs and contribution guide.
-
-What we DO have is some non-idiomatic code because the original author is only learning Golang.
-:P
-
 ## License
 
 [MIT](./LICENSE)
