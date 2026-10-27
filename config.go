@@ -33,7 +33,6 @@ var defaultRows = rowConfigs(
 	"load",
 	"cpu",
 	"memory",
-	"swap",
 	"topprocesses",
 	"diskspace",
 	"failedunits",
