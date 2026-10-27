@@ -28,6 +28,7 @@ var defaultRows = rowConfigs(
 	"load",
 	"memory",
 	"swap",
+	"topprocesses",
 	"diskspace",
 	"failedunits",
 )

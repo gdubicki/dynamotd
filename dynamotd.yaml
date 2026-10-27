@@ -17,6 +17,7 @@ rows:
   - load
   - memory
   - swap
+  - topprocesses
   - diskspace
   - failedunits
 
