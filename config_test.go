@@ -1,7 +1,9 @@
 package main
 
 import (
+	"io/fs"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -61,4 +63,22 @@ func TestParseConfigEmptyFile(t *testing.T) {
 	cfg, err := parseConfig([]byte(""), "test.yaml")
 	require.NoError(t, err)
 	assert.Equal(t, defaultConfig(), cfg)
+}
+
+func TestConfigPathsDontIncludeCurrentDirectory(t *testing.T) {
+	for _, path := range configPaths() {
+		assert.True(t, filepath.IsAbs(path), path)
+	}
+}
+
+func TestLoadConfigFromPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "custom.yaml")
+	require.NoError(t, os.WriteFile(path, []byte("rows: [fqdn]\n"), 0o644))
+
+	cfg, err := loadConfig(path)
+	require.NoError(t, err)
+	assert.Equal(t, []string{"fqdn"}, cfg.Rows)
+
+	_, err = loadConfig(filepath.Join(t.TempDir(), "missing.yaml"))
+	assert.ErrorIs(t, err, fs.ErrNotExist)
 }

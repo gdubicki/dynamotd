@@ -42,17 +42,26 @@ func defaultConfig() config {
 }
 
 // configPaths returns the locations of the config file, in the order they are searched.
+// The current directory is deliberately not one of them, as this app usually runs as root.
 func configPaths() []string {
 	paths := []string{filepath.Join("/etc", configFileName)}
 	if home, err := os.UserHomeDir(); err == nil {
 		paths = append(paths, filepath.Join(home, ".dynamotd", configFileName))
 	}
-	return append(paths, configFileName)
+	return paths
 }
 
-// loadConfig reads the first config file found. The config file is optional -
-// the defaults are enough to run this app.
-func loadConfig() (config, error) {
+// loadConfig reads the config file from the given path, or if it's empty - the first config file found
+// in the default locations. The config file is optional - the defaults are enough to run this app.
+func loadConfig(path string) (config, error) {
+	if path != "" {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return config{}, err
+		}
+		return parseConfig(data, path)
+	}
+
 	for _, path := range configPaths() {
 		data, err := os.ReadFile(path)
 		if errors.Is(err, fs.ErrNotExist) {
