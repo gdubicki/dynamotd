@@ -1,0 +1,52 @@
+# See https://goreleaser.com for more information
+version: 2
+
+project_name: dynamotd
+
+builds:
+  - env:
+      # static binaries, so that they work on any Linux distro, regardless of its glibc version
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+
+archives:
+  # plain binaries, named like before, so that the ".../releases/latest/download/dynamotd-linux-amd64"
+  # URLs keep working
+  - formats: [binary]
+    name_template: >-
+      {{ .ProjectName }}-{{ if eq .Os "darwin" }}macos{{ else }}{{ .Os }}{{ end }}-{{ .Arch }}
+
+nfpms:
+  - package_name: dynamotd
+    file_name_template: "{{ .ConventionalFileName }}"
+    homepage: https://github.com/gdubicki/dynamotd
+    maintainer: Greg Dubicki <grzegorz.dubicki@gmail.com>
+    description: Dynamic MOTD with the info you need to troubleshoot a server
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    contents:
+      - src: dynamotd.yaml
+        dst: /etc/dynamotd.yaml
+        type: config|noreplace
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  draft: true
+  prerelease: auto
+
+changelog:
+  use: github-native

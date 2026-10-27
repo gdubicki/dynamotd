@@ -24,13 +24,16 @@ it, then something IS wrong with the server, isn't it?).
 ```
 curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd && chmod +x /usr/local/bin/dynamotd
 ```
+The Linux binaries are static, so they work on any distro. Alternatively, install the `.deb` or `.rpm` package
+from the [latest release](https://github.com/gdubicki/dynamotd/releases/latest) - it installs the binary
+as `/usr/bin/dynamotd` and the example config as `/etc/dynamotd.yaml`.
 2. (Optionally) Configure with `/etc/dynamotd.yaml` file. See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
 3. Make it shown instead of or after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
 ```
 session    optional     pam_exec.so stdout /usr/local/bin/dynamotd -force-color
 ```
-(or `-no-color` if you prefer plain black-and-white output).
+(or `-no-color` if you prefer plain black-and-white output). Use `/usr/bin/dynamotd` if you installed a package.
 
 ## Troubleshooting
 
@@ -53,15 +56,22 @@ Check out all the available command-line arguments by running `dynamotd -help`.
 Requirements:
 * Go v. 1.22+
 
-How to build:
+How to build for your current OS and arch:
 ```
-./build.sh
+go build
+```
+
+How to build all the release binaries and packages locally (requires [GoReleaser](https://goreleaser.com)):
+```
+goreleaser release --snapshot --clean
 ```
 
 How to run tests:
 ```
-go test -v tests/*
+go test ./...
 ```
+
+How to release: push a `v*` tag. GitHub Actions will build the binaries and packages and create a draft release.
 
 Optional, but recommended: use [pre-commit](https://pre-commit.com) and install the apps used by our config.
 
