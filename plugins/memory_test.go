@@ -17,6 +17,7 @@ const gib = 1024 * 1024 * 1024
 func mockMemory(t *testing.T, memory mem.VirtualMemoryStat, swap mem.SwapMemoryStat, vmstat string) {
 	origMemory, origSwap, origPath := getVirtualMemory, getSwap, vmstatPath
 	t.Cleanup(func() { getVirtualMemory, getSwap, vmstatPath = origMemory, origSwap, origPath })
+	mockKernelLog(t, nil)
 
 	getVirtualMemory = func(context.Context) (*mem.VirtualMemoryStat, error) { return &memory, nil }
 	getSwap = func(context.Context) (*mem.SwapMemoryStat, error) { return &swap, nil }

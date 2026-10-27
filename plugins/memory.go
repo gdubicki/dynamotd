@@ -45,7 +45,7 @@ var getSwap = mem.SwapMemoryWithContext
 var vmstatPath = "/proc/vmstat"
 
 // Memory shows the RAM usage, the swap usage if there is any swap, and the number of processes killed
-// by the OOM killer since boot, if there were any.
+// by the OOM killer since boot with the time of the last kill, if there were any.
 func Memory(ctx context.Context, settings memorySettings) []dynamotd.Row {
 	memoryStat, err := getVirtualMemory(ctx)
 	if err != nil {
@@ -83,15 +83,8 @@ func Memory(ctx context.Context, settings memorySettings) []dynamotd.Row {
 
 	// it's not available on macOS and old Linux kernels
 	if oomKills, err := getOOMKills(); err == nil && oomKills > 0 {
-		unit := "OOM kill"
-		if oomKills > 1 {
-			unit += "s"
-		}
-		value = append(value,
-			dynamotd.ValueDescription(", "),
-			dynamotd.ValueCritical(fmt.Sprintf("%d %s", oomKills, unit)),
-			dynamotd.ValueDescription(" since boot"),
-		)
+		value = append(value, dynamotd.ValueDescription(", "))
+		value = append(value, oomKillsValue(oomKills)...)
 	}
 
 	return []dynamotd.Row{{
