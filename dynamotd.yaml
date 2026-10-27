@@ -13,6 +13,7 @@ rows:
   - fqdn
   - ip
   - uptime
+  - reboot
   -
   - load
   - cpu
