@@ -5,7 +5,7 @@ import (
 	"github.com/Tonyfilla/go-humanize"
 	"github.com/fatih/color"
 	. "github.com/gdubicki/dynamotd/dynamotd"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 )
 
 func DiskSpace(path string) Row {

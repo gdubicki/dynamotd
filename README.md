@@ -54,7 +54,7 @@ Check out all the available command-line arguments by running `dynamotd -help`.
 ## Contributing
 
 Requirements:
-* Go v. 1.22+
+* Go v. 1.26+
 
 How to build for your current OS and arch:
 ```
