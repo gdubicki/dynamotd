@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"context"
+	"io/fs"
 	"testing"
 
 	"github.com/gdubicki/dynamotd/dynamotd"
@@ -9,6 +10,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestUsersWithoutUtmpFile(t *testing.T) {
+	orig := getUsers
+	t.Cleanup(func() { getUsers = orig })
+
+	getUsers = func(context.Context) ([]host.UserStat, error) {
+		return nil, &fs.PathError{Op: "open", Path: "/var/run/utmp", Err: fs.ErrNotExist}
+	}
+
+	assert.Empty(t, Users(context.Background(), dynamotd.NoSettings{}))
+}
 
 func TestUsers(t *testing.T) {
 	orig := getUsers

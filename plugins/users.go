@@ -2,7 +2,9 @@ package plugins
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 
 	"github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/shirou/gopsutil/v4/host"
@@ -21,6 +23,10 @@ var getUsers = host.UsersWithContext
 // someone else is working on it. (The session being opened is usually not listed yet.)
 func Users(ctx context.Context, _ dynamotd.NoSettings) []dynamotd.Row {
 	users, err := getUsers(ctx)
+	// there is no utmp file f.e. in containers, which means that nobody is logged in
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
 	if err != nil {
 		return []dynamotd.Row{dynamotd.ErrorRow(usersLabel, fmt.Errorf("error getting logged in users: %w", err))}
 	}
