@@ -24,6 +24,12 @@ it, then something IS wrong with the server, isn't it?).
 ```
 curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd && chmod +x /usr/local/bin/dynamotd
 ```
+As it will run as root on every login, it's worth verifying that the binary was built by this repo's GitHub Actions from its source code, using the [GitHub CLI](https://cli.github.com/):
+```
+gh attestation verify /usr/local/bin/dynamotd --repo gdubicki/dynamotd
+```
+Or at least compare its checksum with the `checksums.txt` file from the same release.
+
 The Linux binaries are static, so they work on any distro. Alternatively, install the `.deb` or `.rpm` package from the [latest release](https://github.com/gdubicki/dynamotd/releases/latest) - it installs the binary as `/usr/bin/dynamotd` and the example config as `/etc/dynamotd.yaml`.
 
 2. (Optionally) Configure with `/etc/dynamotd.yaml` file (or `~/.dynamotd/dynamotd.yaml` - the first one found is used, or any file passed with `-config`). See the example config in [dynamotd.yaml](./dynamotd.yaml).
