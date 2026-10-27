@@ -7,14 +7,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gdubicki/dynamotd/dynamotd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
 func TestParseConfig(t *testing.T) {
 	cfg, err := parseConfig([]byte("rows:\n  - timestamp\n  -\n  - fqdn\n"), "test.yaml")
 	require.NoError(t, err)
-	assert.Equal(t, []string{"timestamp", "", "fqdn"}, cfg.Rows)
+	assert.Equal(t, rowConfigs("timestamp", "", "fqdn"), cfg.Rows)
 }
 
 func TestParseConfigWithoutRowsUsesDefaults(t *testing.T) {
@@ -80,9 +82,34 @@ func TestLoadConfigFromPath(t *testing.T) {
 
 	cfg, err := loadConfig(path)
 	require.NoError(t, err)
-	assert.Equal(t, []string{"fqdn"}, cfg.Rows)
+	assert.Equal(t, rowConfigs("fqdn"), cfg.Rows)
 	assert.Equal(t, path, cfg.Path)
 
 	_, err = loadConfig(filepath.Join(t.TempDir(), "missing.yaml"))
 	assert.ErrorIs(t, err, fs.ErrNotExist)
+}
+
+func TestParseConfigRowsWithSettings(t *testing.T) {
+	cfg, err := parseConfig([]byte(`
+rows:
+  - memory:
+      warning: 80
+  - load:
+  - fqdn
+`), "test.yaml")
+	require.NoError(t, err)
+	require.Len(t, cfg.Rows, 3)
+
+	assert.Equal(t, "memory", cfg.Rows[0].Name)
+	require.NotNil(t, cfg.Rows[0].Settings)
+	assert.Equal(t, yaml.MappingNode, cfg.Rows[0].Settings.Kind)
+
+	// a row type name with an empty value is the same as just the name
+	assert.Equal(t, dynamotd.RowConfig{Name: "load"}, cfg.Rows[1])
+	assert.Equal(t, dynamotd.RowConfig{Name: "fqdn"}, cfg.Rows[2])
+}
+
+func TestParseConfigInvalidRow(t *testing.T) {
+	_, err := parseConfig([]byte("rows:\n  - timestamp\n  - memory: {}\n    load: {}\n"), "test.yaml")
+	assert.ErrorContains(t, err, "error in config file test.yaml, line 3: a row should be")
 }

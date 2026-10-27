@@ -6,6 +6,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 // RowType generates rows of the MOTD - usually one, but it may be none (f.e. when there is nothing
@@ -17,26 +19,55 @@ type RowType struct {
 	Generate func(ctx context.Context) []Row
 }
 
-var registry = map[string]RowType{}
+// RowConfig is a row type to show, as configured in the config file.
+type RowConfig struct {
+	Name string
+	// Settings of the row type, nil if not set
+	Settings *yaml.Node
+}
+
+// newRowType creates a row type with the given settings
+type newRowType func(settings *yaml.Node) (RowType, error)
+
+var registry = map[string]newRowType{}
 
 // Register makes a row type available under the given name(s) in the config file.
 // It is meant to be called from the plugins' init() functions.
-func Register(rowType RowType, names ...string) {
+//
+// The settings for generate are the defaults, overridden with the ones from the config file,
+// so they should be a struct with yaml tags (NoSettings if there are none). If it implements
+// Validator, then it's used to validate them.
+func Register[S any](label string, defaults S, generate func(ctx context.Context, settings S) []Row, names ...string) {
+	newRowType := func(settingsNode *yaml.Node) (RowType, error) {
+		settings, err := decodeSettings(defaults, settingsNode)
+		if err != nil {
+			return RowType{}, err
+		}
+		return RowType{
+			Label:    label,
+			Generate: func(ctx context.Context) []Row { return generate(ctx, settings) },
+		}, nil
+	}
+
 	for _, name := range names {
 		if _, exists := registry[name]; exists {
 			panic(fmt.Sprintf("row type '%s' registered twice", name))
 		}
-		registry[name] = rowType
+		registry[name] = newRowType
 	}
 }
 
-// Lookup returns the row types with the given names.
-func Lookup(names []string) ([]RowType, error) {
-	rowTypes := make([]RowType, 0, len(names))
-	for _, name := range names {
-		rowType, ok := registry[name]
+// Lookup returns the configured row types.
+func Lookup(rowConfigs []RowConfig) ([]RowType, error) {
+	rowTypes := make([]RowType, 0, len(rowConfigs))
+	for _, rowConfig := range rowConfigs {
+		newRowType, ok := registry[rowConfig.Name]
 		if !ok {
-			return nil, fmt.Errorf("unknown row type '%s' - available ones are: %s", name, strings.Join(Names(), ", "))
+			return nil, fmt.Errorf("unknown row type '%s' - available ones are: %s", rowConfig.Name, strings.Join(Names(), ", "))
+		}
+		rowType, err := newRowType(rowConfig.Settings)
+		if err != nil {
+			return nil, fmt.Errorf("invalid settings for row type '%s': %w", rowConfig.Name, err)
 		}
 		rowTypes = append(rowTypes, rowType)
 	}
@@ -113,9 +144,9 @@ func flatten(rowsByType [][]Row) []Row {
 	return rows
 }
 
-// SingleRow adapts a function generating exactly one row, not using the context, to RowType.Generate.
-func SingleRow(generate func() Row) func(ctx context.Context) []Row {
-	return func(context.Context) []Row {
-		return []Row{generate()}
+// SingleRow adapts a function generating exactly one row, not using the context, to Register's generate.
+func SingleRow[S any](generate func(settings S) Row) func(ctx context.Context, settings S) []Row {
+	return func(_ context.Context, settings S) []Row {
+		return []Row{generate(settings)}
 	}
 }

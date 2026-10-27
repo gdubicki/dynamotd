@@ -9,17 +9,13 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{Label: loadLabel, Generate: dynamotd.SingleRow(Load)}, "load")
+	dynamotd.Register(loadLabel, dynamotd.Thresholds{Warning: 0.9, Critical: 1.1}, dynamotd.SingleRow(Load), "load")
 }
 
 const loadLabel = "CPU Load (1/5/15)"
 
-func Load() dynamotd.Row {
-	// TODO: make below configurable
-	// (thresholds are per core)
-	var warningThreshold = 0.9
-	var criticalThreshold = 1.1
-
+// Load shows the load average, with the thresholds per CPU core.
+func Load(thresholds dynamotd.Thresholds) dynamotd.Row {
 	cores := float64(runtime.NumCPU())
 
 	avgStat, err := load.Avg()
@@ -34,7 +30,7 @@ func Load() dynamotd.Row {
 
 	loadString := func(load float64) dynamotd.ColorString {
 		return dynamotd.ColorString{
-			Color: dynamotd.ThresholdColor(load, warningThreshold*cores, criticalThreshold*cores),
+			Color: thresholds.Color(load / cores),
 			Text:  fmt.Sprintf("%.2f", load),
 		}
 	}

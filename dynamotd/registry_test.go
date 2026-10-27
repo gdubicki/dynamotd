@@ -10,7 +10,7 @@ import (
 )
 
 func TestLookupUnknown(t *testing.T) {
-	_, err := Lookup([]string{"no-such-row"})
+	_, err := Lookup([]RowConfig{{Name: "no-such-row"}})
 	assert.ErrorContains(t, err, "unknown row type 'no-such-row' - available ones are: ")
 }
 

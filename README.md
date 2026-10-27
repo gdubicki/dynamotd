@@ -60,6 +60,29 @@ See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
 After changing the config, check it with `dynamotd -check`.
 
+### Row types
+
+These are the row types you can use in the `rows` list. Some of them have settings, which you can change like this:
+```yaml
+rows:
+  - memory:
+      warning: 80
+      critical: 90
+```
+The `warning` and `critical` thresholds define when the value is shown in yellow or red.
+
+| Row type | Shows | Settings (defaults) |
+|---|---|---|
+| `timestamp` | Current date and time | - |
+| `fqdn` | Fully qualified domain name | - |
+| `ip` | Local and external IP | - |
+| `uptime` | Time since the last boot | `warning: 90`, `critical: 365` - in days |
+| `cores` | Number of CPU cores and their clock speed | - |
+| `load` | Load averages and number of CPU cores | `warning: 0.9`, `critical: 1.1` - per CPU core |
+| `memory` | RAM usage | `warning: 90`, `critical: 95` - in % |
+| `diskspace` | Disk space usage of `/` | `warning: 75`, `critical: 90` - in % |
+| empty or `emptyLine` | Empty line | - |
+
 Check out all the available command-line arguments by running `dynamotd -help`.
 
 ## Contributing

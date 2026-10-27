@@ -10,12 +10,14 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{Label: uptimeLabel, Generate: dynamotd.SingleRow(Uptime)}, "uptime")
+	dynamotd.Register(uptimeLabel, dynamotd.Thresholds{Warning: 90, Critical: 365}, dynamotd.SingleRow(Uptime), "uptime")
 }
 
 const uptimeLabel = "Uptime"
 
-func Uptime() dynamotd.Row {
+// Uptime shows the time since the last boot, with the thresholds in days, as a long uptime
+// usually means that the latest kernel security fixes are not applied.
+func Uptime(thresholds dynamotd.Thresholds) dynamotd.Row {
 	uptimeSeconds, err := host.Uptime()
 	if err != nil {
 		return dynamotd.ErrorRow(uptimeLabel, fmt.Errorf("error getting uptime: %w", err))
@@ -24,23 +26,14 @@ func Uptime() dynamotd.Row {
 	return dynamotd.Row{
 		Label: dynamotd.SingleColorLabel(uptimeLabel),
 		Value: dynamotd.ToColorText(
-			dynamotd.ColorString{Color: GetUptimeColor(uptimeSeconds), Text: GetUptimeString(uptimeSeconds)},
+			dynamotd.ColorString{Color: GetUptimeColor(uptimeSeconds, thresholds), Text: GetUptimeString(uptimeSeconds)},
 		),
 	}
 }
 
-func GetUptimeColor(uptimeSeconds uint64) color.Attribute {
-	uptime := getUptimeValues(uptimeSeconds)
-
-	// TODO: make this configurable
-	switch {
-	case uptime.years >= 1:
-		return dynamotd.ValueCriticalColor
-	case uptime.months >= 3:
-		return dynamotd.ValueWarningColor
-	default:
-		return dynamotd.ValueOkColor
-	}
+func GetUptimeColor(uptimeSeconds uint64, thresholdsInDays dynamotd.Thresholds) color.Attribute {
+	const secondsInADay = 24 * 60 * 60
+	return thresholdsInDays.Color(float64(uptimeSeconds) / secondsInADay)
 }
 
 func GetUptimeString(uptimeSeconds uint64) string {

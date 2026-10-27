@@ -52,18 +52,6 @@ func ValueCritical(text string) ColorString {
 	return ColorString{ValueCriticalColor, text}
 }
 
-// ThresholdColor returns the ok, warning or critical color depending on which threshold the value reached.
-func ThresholdColor(value, warningThreshold, criticalThreshold float64) color.Attribute {
-	switch {
-	case value >= criticalThreshold:
-		return ValueCriticalColor
-	case value >= warningThreshold:
-		return ValueWarningColor
-	default:
-		return ValueOkColor
-	}
-}
-
 // for labels most (every?) of the times we need to have it whole
 // in a single color
 func SingleColorLabel(text string) ColorText {

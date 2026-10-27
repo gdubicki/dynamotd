@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/gdubicki/dynamotd/dynamotd"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,7 +18,7 @@ const maxRows = 40
 
 const configFileName = "dynamotd.yaml"
 
-var defaultRows = []string{
+var defaultRows = rowConfigs(
 	"timestamp",
 	"",
 	"fqdn",
@@ -27,6 +28,14 @@ var defaultRows = []string{
 	"load",
 	"memory",
 	"diskspace",
+)
+
+func rowConfigs(names ...string) []dynamotd.RowConfig {
+	rows := make([]dynamotd.RowConfig, 0, len(names))
+	for _, name := range names {
+		rows = append(rows, dynamotd.RowConfig{Name: name})
+	}
+	return rows
 }
 
 // the rows that don't finish in this time are shown as timed out, so that a login is never blocked for long
@@ -35,7 +44,7 @@ const defaultTimeout = 1 * time.Second
 type config struct {
 	// Path is the config file used, empty if none
 	Path    string
-	Rows    []string
+	Rows    []dynamotd.RowConfig
 	Timeout time.Duration
 }
 
@@ -79,8 +88,8 @@ func loadConfig(path string) (config, error) {
 
 func parseConfig(data []byte, path string) (config, error) {
 	var raw struct {
-		// pointers, as otherwise the empty (null) elements, used for empty lines, would be skipped
-		Rows    *[]*string     `yaml:"rows"`
+		// nodes, as the rows can be strings, nulls (empty lines) or maps (with settings)
+		Rows    *[]yaml.Node   `yaml:"rows"`
 		Timeout *time.Duration `yaml:"timeout"`
 	}
 	decoder := yaml.NewDecoder(bytes.NewReader(data))
@@ -105,13 +114,13 @@ func parseConfig(data []byte, path string) (config, error) {
 		return cfg, nil
 	}
 
-	rows := make([]string, 0, len(*raw.Rows))
-	for _, row := range *raw.Rows {
-		if row == nil {
-			rows = append(rows, "")
-		} else {
-			rows = append(rows, *row)
+	rows := make([]dynamotd.RowConfig, 0, len(*raw.Rows))
+	for _, node := range *raw.Rows {
+		row, err := parseRow(&node)
+		if err != nil {
+			return config{}, fmt.Errorf("error in config file %s, line %d: %w", path, node.Line, err)
 		}
+		rows = append(rows, row)
 	}
 
 	if len(rows) == 0 {
@@ -122,4 +131,25 @@ func parseConfig(data []byte, path string) (config, error) {
 	}
 	cfg.Rows = rows
 	return cfg, nil
+}
+
+// parseRow parses a row, which can be:
+// * a row type name,
+// * empty, for an empty line,
+// * a map with a single key - the row type name, and its settings as the value.
+func parseRow(node *yaml.Node) (dynamotd.RowConfig, error) {
+	switch {
+	case node.Kind == yaml.ScalarNode && node.Tag == "!!null":
+		return dynamotd.RowConfig{Name: ""}, nil
+	case node.Kind == yaml.ScalarNode:
+		return dynamotd.RowConfig{Name: node.Value}, nil
+	case node.Kind == yaml.MappingNode && len(node.Content) == 2:
+		name, settings := node.Content[0], node.Content[1]
+		if settings.Kind == yaml.ScalarNode && settings.Tag == "!!null" {
+			settings = nil
+		}
+		return dynamotd.RowConfig{Name: name.Value, Settings: settings}, nil
+	default:
+		return dynamotd.RowConfig{}, fmt.Errorf("a row should be a row type name or a map with a row type name as the only key and its settings as the value")
+	}
 }

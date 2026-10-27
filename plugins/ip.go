@@ -14,9 +14,8 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{
-		Label:    ipLabel,
-		Generate: func(ctx context.Context) []dynamotd.Row { return []dynamotd.Row{Ip(ctx)} },
+	dynamotd.Register(ipLabel, dynamotd.NoSettings{}, func(ctx context.Context, _ dynamotd.NoSettings) []dynamotd.Row {
+		return []dynamotd.Row{Ip(ctx)}
 	}, "ip")
 }
 

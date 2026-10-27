@@ -9,12 +9,12 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{Label: coresLabel, Generate: dynamotd.SingleRow(Cores)}, "cores")
+	dynamotd.Register(coresLabel, dynamotd.NoSettings{}, dynamotd.SingleRow(Cores), "cores")
 }
 
 const coresLabel = "CPU"
 
-func Cores() dynamotd.Row {
+func Cores(dynamotd.NoSettings) dynamotd.Row {
 	coresDescription, err := getCoresDescription()
 	if err != nil {
 		return dynamotd.ErrorRow(coresLabel, err)

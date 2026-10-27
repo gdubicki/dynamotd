@@ -9,16 +9,13 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{
-		Label:    "Disk space (/)",
-		Generate: dynamotd.SingleRow(func() dynamotd.Row { return DiskSpace("/") }),
-	}, "diskspace")
+	dynamotd.Register("Disk space (/)", dynamotd.Thresholds{Warning: 75, Critical: 90},
+		dynamotd.SingleRow(func(thresholds dynamotd.Thresholds) dynamotd.Row { return DiskSpace("/", thresholds) }),
+		"diskspace")
 }
 
-func DiskSpace(path string) dynamotd.Row {
-	var warningThreshold = 75.0
-	var criticalThreshold = 90.0
-
+// DiskSpace shows the disk space usage of the filesystem with the given path, with the thresholds in %.
+func DiskSpace(path string, thresholds dynamotd.Thresholds) dynamotd.Row {
 	label := fmt.Sprintf("Disk space (%s)", path)
 
 	du, err := disk.Usage(path)
@@ -28,7 +25,7 @@ func DiskSpace(path string) dynamotd.Row {
 
 	percentageUsed := du.UsedPercent
 
-	color := dynamotd.ThresholdColor(percentageUsed, warningThreshold, criticalThreshold)
+	color := thresholds.Color(percentageUsed)
 
 	return dynamotd.Row{
 		Label: dynamotd.SingleColorLabel(label),

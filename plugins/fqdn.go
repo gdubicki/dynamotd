@@ -6,12 +6,12 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{Label: fqdnLabel, Generate: dynamotd.SingleRow(Fqdn)}, "fqdn")
+	dynamotd.Register(fqdnLabel, dynamotd.NoSettings{}, dynamotd.SingleRow(Fqdn), "fqdn")
 }
 
 const fqdnLabel = "FQDN"
 
-func Fqdn() dynamotd.Row {
+func Fqdn(dynamotd.NoSettings) dynamotd.Row {
 	return dynamotd.Row{
 		Label: dynamotd.SingleColorLabel(fqdnLabel),
 		Value: dynamotd.SingleColorValue(gofqdn.Get()),

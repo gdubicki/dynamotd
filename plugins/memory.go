@@ -9,15 +9,13 @@ import (
 )
 
 func init() {
-	dynamotd.Register(dynamotd.RowType{Label: memoryLabel, Generate: dynamotd.SingleRow(Memory)}, "memory")
+	dynamotd.Register(memoryLabel, dynamotd.Thresholds{Warning: 90, Critical: 95}, dynamotd.SingleRow(Memory), "memory")
 }
 
 const memoryLabel = "RAM"
 
-func Memory() dynamotd.Row {
-	var warningThreshold = 90.0
-	var criticalThreshold = 95.0
-
+// Memory shows the RAM usage, with the thresholds in %.
+func Memory(thresholds dynamotd.Thresholds) dynamotd.Row {
 	memoryStat, err := mem.VirtualMemory()
 	if err != nil {
 		return dynamotd.ErrorRow(memoryLabel, fmt.Errorf("error getting memory info: %w", err))
@@ -28,7 +26,7 @@ func Memory() dynamotd.Row {
 
 	percentage := float64(memoryUsedBytes) / float64(memoryTotalBytes) * 100
 
-	color := dynamotd.ThresholdColor(percentage, warningThreshold, criticalThreshold)
+	color := thresholds.Color(percentage)
 
 	return dynamotd.Row{
 		Label: dynamotd.SingleColorLabel(memoryLabel),

@@ -2,6 +2,11 @@
 # It is completely optional. The values below represent the defaults.
 
 # empty line is an empty line, duh
+# some row types have settings, f.e. to change the thresholds of when they are shown in yellow or red:
+#   - memory:
+#       warning: 80
+#       critical: 90
+# see the README for all the row types and their settings
 rows:
   - timestamp
   -
