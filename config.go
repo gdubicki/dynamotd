@@ -22,19 +22,21 @@ const configFileName = "dynamotd.yaml"
 
 var defaultRows = rowConfigs(
 	"timestamp",
+	"clock",
 	"",
 	"fqdn",
 	"ip",
 	"uptime",
-	"users",
 	"reboot",
-	"clock",
+	"",
+	"users",
 	"",
 	"load",
 	"cpu",
-	"memory",
 	"topprocesses",
+	"memory",
 	"diskspace",
+	"",
 	"failedunits",
 )
 

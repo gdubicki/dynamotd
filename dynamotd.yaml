@@ -13,19 +13,21 @@
 # see the README for all the row types and their settings
 rows:
   - timestamp
+  - clock
   -
   - fqdn
   - ip
   - uptime
-  - users
   - reboot
-  - clock
+  -
+  - users
   -
   - load
   - cpu
-  - memory
   - topprocesses
+  - memory
   - diskspace
+  -
   - failedunits
 
 # rows that don't finish within this time are shown as "timed out",
