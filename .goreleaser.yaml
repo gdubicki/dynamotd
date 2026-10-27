@@ -40,6 +40,17 @@ nfpms:
       - src: dynamotd.yaml
         dst: /etc/dynamotd.yaml
         type: config|noreplace
+      # Debian and Ubuntu run these scripts on login (using pam_motd), so it works out of the box there
+      - src: packaging/update-motd.d/50-dynamotd
+        dst: /etc/update-motd.d/50-dynamotd
+        type: config|noreplace
+        packager: deb
+        file_info:
+          mode: 0755
+    overrides:
+      deb:
+        scripts:
+          postinstall: packaging/deb/postinst
 
 checksum:
   name_template: checksums.txt

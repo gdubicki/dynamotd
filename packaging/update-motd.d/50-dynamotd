@@ -1,0 +1,4 @@
+#!/bin/sh
+# Shows the dynamic MOTD from https://github.com/gdubicki/dynamotd on login.
+# Installed by the dynamotd package. To disable it, delete this file - package upgrades won't restore it.
+exec /usr/bin/dynamotd -force-color

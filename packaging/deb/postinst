@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# Before the package included the update-motd.d script, the README said to run dynamotd from the PAM
+# config. If it's still run from there, then remove the script, to not show the MOTD twice.
+# As it's a conffile, package upgrades won't restore it.
+if [ "$1" = configure ] && [ -e /etc/update-motd.d/50-dynamotd ] \
+	&& grep -qs '^[^#]*pam_exec.*dynamotd' /etc/pam.d/*; then
+	rm -f /etc/update-motd.d/50-dynamotd
+	echo "dynamotd is already run from /etc/pam.d/, so /etc/update-motd.d/50-dynamotd was removed to not show the MOTD twice."
+fi

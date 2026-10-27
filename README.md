@@ -34,7 +34,11 @@ The Linux binaries are static, so they work on any distro. Alternatively, instal
 
 2. (Optionally) Configure with `/etc/dynamotd.yaml` file (or `~/.dynamotd/dynamotd.yaml` - the first one found is used, or any file passed with `-config`). See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
-3. Make it shown instead of or after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
+3. Make it shown on login:
+
+* If you installed the `.deb` package on Debian or Ubuntu, then there is nothing to do - it is shown by the `/etc/update-motd.d/50-dynamotd` script that comes with it. You may want to remove the other scripts in that directory and the static `/etc/motd` though. To use `-no-color` (see below), edit that script. To disable it, delete it - package upgrades won't restore it. If you already run dynamotd from `/etc/pam.d/` (see below), the package removes that script itself, so the MOTD isn't shown twice.
+
+* Otherwise, make it shown instead of or after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
 ```
 session    optional     pam_exec.so stdout /usr/local/bin/dynamotd -force-color
 ```
