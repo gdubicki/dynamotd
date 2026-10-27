@@ -71,8 +71,7 @@ go test ./...
 golangci-lint run
 ```
 
-How to add a new row type: create a file in [plugins/](./plugins) with a function returning a `dynamotd.Row`
-and register it under a name (to be used in the config file) in an `init()` function - see the existing plugins.
+How to add a new row type: create a file in [plugins/](./plugins) with a function returning a `dynamotd.Row` and register it under a name (to be used in the config file) in an `init()` function - see the existing plugins.
 
 How to release: push a `v*` tag. GitHub Actions will build the binaries and packages and create a draft release.
 
