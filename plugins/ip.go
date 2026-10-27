@@ -42,7 +42,7 @@ func getLocalIP() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
@@ -63,7 +63,7 @@ func getExternalIP() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("no or too slow internet connection")
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("unexpected HTTP status %s", resp.Status)

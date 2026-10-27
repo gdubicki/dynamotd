@@ -66,9 +66,10 @@ How to build all the release binaries and packages locally (requires [GoReleaser
 goreleaser release --snapshot --clean
 ```
 
-How to run tests:
+How to run tests and the linter (requires [golangci-lint](https://golangci-lint.run)):
 ```
 go test ./...
+golangci-lint run
 ```
 
 How to add a new row type: create a file in [plugins/](./plugins) with a function returning a `dynamotd.Row`
