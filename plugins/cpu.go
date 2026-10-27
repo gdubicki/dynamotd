@@ -84,19 +84,22 @@ func CPUUsage(ctx context.Context, settings cpuUsageSettings) []dynamotd.Row {
 	}
 	percent := func(value float64) float64 { return value / total * 100 }
 
+	// f.e. "25% busy (16% user, 9% kernel), 30% waiting for disk, 0% stolen by hypervisor"
 	value := []dynamotd.ColorString{
+		dynamotd.ValueNeutral(fmt.Sprintf("%.0f%%", percent(user+system))),
+		dynamotd.ValueDescription(" busy ("),
 		dynamotd.ValueNeutral(fmt.Sprintf("%.0f%%", percent(user))),
 		dynamotd.ValueDescription(" user, "),
 		dynamotd.ValueNeutral(fmt.Sprintf("%.0f%%", percent(system))),
-		dynamotd.ValueDescription(" system"),
+		dynamotd.ValueDescription(" kernel)"),
 	}
 	if showIOWaitAndSteal {
 		value = append(value,
 			dynamotd.ValueDescription(", "),
 			dynamotd.ColorString{Color: settings.IOWait.Color(percent(ioWait)), Text: fmt.Sprintf("%.0f%%", percent(ioWait))},
-			dynamotd.ValueDescription(" iowait, "),
+			dynamotd.ValueDescription(" waiting for disk, "),
 			dynamotd.ColorString{Color: settings.Steal.Color(percent(steal)), Text: fmt.Sprintf("%.0f%%", percent(steal))},
-			dynamotd.ValueDescription(" steal"),
+			dynamotd.ValueDescription(" stolen by hypervisor"),
 		)
 	}
 

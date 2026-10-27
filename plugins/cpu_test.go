@@ -32,10 +32,10 @@ func TestCPUUsageLinux(t *testing.T) {
 	rows := CPUUsage(context.Background(), defaultCPUUsageSettings)
 
 	require.Len(t, rows, 1)
-	assert.Equal(t, "15% user, 5% system, 30% iowait, 6% steal", rows[0].Value.String())
+	assert.Equal(t, "20% busy (15% user, 5% kernel), 30% waiting for disk, 6% stolen by hypervisor", rows[0].Value.String())
 	parts := rows[0].Value.Parts()
-	assert.Equal(t, dynamotd.ValueCriticalColor, parts[5].Color, "iowait")
-	assert.Equal(t, dynamotd.ValueWarningColor, parts[7].Color, "steal")
+	assert.Equal(t, dynamotd.ValueCriticalColor, parts[7].Color, "waiting for disk")
+	assert.Equal(t, dynamotd.ValueWarningColor, parts[9].Color, "stolen by hypervisor")
 }
 
 func TestCPUUsageMacOS(t *testing.T) {
@@ -44,5 +44,5 @@ func TestCPUUsageMacOS(t *testing.T) {
 	rows := CPUUsage(context.Background(), defaultCPUUsageSettings)
 
 	require.Len(t, rows, 1)
-	assert.Equal(t, "30% user, 10% system", rows[0].Value.String())
+	assert.Equal(t, "40% busy (30% user, 10% kernel)", rows[0].Value.String())
 }
