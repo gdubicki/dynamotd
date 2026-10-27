@@ -80,6 +80,7 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 | `cores` | Number of CPU cores and their clock speed | - |
 | `load` | Load averages and number of CPU cores | `warning: 0.9`, `critical: 1.1` - per CPU core |
 | `memory` | RAM usage | `warning: 90`, `critical: 95` - in % |
+| `swap` | Swap usage, and the number of processes killed by the OOM killer since boot - only if there were any | `warning: 50`, `critical: 80` - in % of swap used |
 | `diskspace` | Disk space usage of `/`, and of any other writable filesystem that reached the warning threshold for space or inodes. Inodes usage is shown only if it reached its warning threshold. | `warning: 75`, `critical: 90` - in % of space used, `inodes: {warning: 75, critical: 90}` - in % of inodes used, `always: ["/"]` - filesystems always shown, `others: true` - whether to show the other filesystems |
 | `failedunits` | Failed systemd units - only if there are any | - |
 | empty or `emptyLine` | Empty line | - |

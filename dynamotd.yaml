@@ -16,6 +16,7 @@ rows:
   -
   - load
   - memory
+  - swap
   - diskspace
   - failedunits
 
