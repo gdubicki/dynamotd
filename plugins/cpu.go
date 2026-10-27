@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 	"time"
@@ -41,15 +42,27 @@ var showIOWaitAndSteal = runtime.GOOS == "linux"
 
 // for mocking in tests
 var sampleCPUTimes = func(ctx context.Context) (before, after cpu.TimesStat, err error) {
+	// sum the per-CPU times, as on macOS the total ones are sometimes not updated for a second or more
 	sample := func() (cpu.TimesStat, error) {
-		times, err := cpu.TimesWithContext(ctx, false)
+		perCPU, err := cpu.TimesWithContext(ctx, true)
 		if err != nil {
 			return cpu.TimesStat{}, err
 		}
-		if len(times) == 0 {
+		if len(perCPU) == 0 {
 			return cpu.TimesStat{}, fmt.Errorf("no CPU times")
 		}
-		return times[0], nil
+		var total cpu.TimesStat
+		for _, t := range perCPU {
+			total.User += t.User
+			total.Nice += t.Nice
+			total.System += t.System
+			total.Irq += t.Irq
+			total.Softirq += t.Softirq
+			total.Iowait += t.Iowait
+			total.Steal += t.Steal
+			total.Idle += t.Idle
+		}
+		return total, nil
 	}
 
 	if before, err = sample(); err != nil {
@@ -69,6 +82,9 @@ var sampleCPUTimes = func(ctx context.Context) (before, after cpu.TimesStat, err
 // or stolen by the hypervisor, as the load average alone doesn't tell that.
 func CPUUsage(ctx context.Context, settings cpuUsageSettings) []dynamotd.Row {
 	before, after, err := sampleCPUTimes(ctx)
+	if errors.Is(err, context.DeadlineExceeded) {
+		return []dynamotd.Row{dynamotd.TimedOutRow(cpuUsageLabel)}
+	}
 	if err != nil {
 		return []dynamotd.Row{dynamotd.ErrorRow(cpuUsageLabel, fmt.Errorf("error getting CPU times: %w", err))}
 	}
