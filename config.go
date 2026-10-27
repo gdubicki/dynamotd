@@ -24,6 +24,7 @@ var defaultRows = rowConfigs(
 	"fqdn",
 	"ip",
 	"uptime",
+	"users",
 	"reboot",
 	"clock",
 	"",

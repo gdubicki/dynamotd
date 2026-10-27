@@ -77,6 +77,7 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 | `fqdn` | Fully qualified domain name | - |
 | `ip` | Local and external IP | - |
 | `uptime` | Time since the last boot | `warning: 90`, `critical: 365` - in days |
+| `users` | Who else is logged in - only if anyone is | - |
 | `reboot` | That a reboot is required - only if it is: on Debian and Ubuntu if any package requires it, on other distros if the most recently installed kernel is not the running one | - |
 | `clock` | That the clock is not synchronized - only if it isn't, and only on Linux. Determined the same way as in `timedatectl`. | - |
 | `cores` | Number of CPU cores and their clock speed | - |
