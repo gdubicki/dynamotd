@@ -3,14 +3,16 @@ updates:
   - package-ecosystem: gomod
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
     groups:
       go-dependencies:
         patterns: ["*"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
     groups:
       github-actions:
         patterns: ["*"]
