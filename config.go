@@ -26,6 +26,7 @@ var defaultRows = rowConfigs(
 	"uptime",
 	"",
 	"load",
+	"cpu",
 	"memory",
 	"swap",
 	"topprocesses",

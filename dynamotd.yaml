@@ -15,6 +15,7 @@ rows:
   - uptime
   -
   - load
+  - cpu
   - memory
   - swap
   - topprocesses

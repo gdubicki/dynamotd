@@ -79,6 +79,7 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 | `uptime` | Time since the last boot | `warning: 90`, `critical: 365` - in days |
 | `cores` | Number of CPU cores and their clock speed | - |
 | `load` | Load averages and number of CPU cores | `warning: 0.9`, `critical: 1.1` - per CPU core |
+| `cpu` | How the CPU time is spent: in user space, in the kernel, waiting for I/O and stolen by the hypervisor (the last two only on Linux) | `iowait: {warning: 10, critical: 25}`, `steal: {warning: 5, critical: 15}` - in % |
 | `memory` | RAM usage | `warning: 90`, `critical: 95` - in % |
 | `swap` | Swap usage, and the number of processes killed by the OOM killer since boot - only if there were any | `warning: 50`, `critical: 80` - in % of swap used |
 | `topprocesses` | The processes using the most CPU - only if the load is high, and the ones using the most RAM - only if its usage is high | `load: 0.9` - per CPU core, `memory: 90` - in %, `count: 3` - number of processes, `always: false` - to show them always |
