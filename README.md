@@ -55,9 +55,9 @@ Check out all the available command-line arguments by running `dynamotd -help`.
 Requirements:
 * Go v. 1.26+
 
-How to build for your current OS and arch:
+How to build for your current OS and arch (the output name is needed, as `dynamotd` is a directory):
 ```
-go build
+go build -o dynamotd-dev
 ```
 
 How to build all the release binaries and packages locally (requires [GoReleaser](https://goreleaser.com)):
