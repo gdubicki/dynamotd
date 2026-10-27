@@ -78,6 +78,7 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 | `ip` | Local and external IP | - |
 | `uptime` | Time since the last boot | `warning: 90`, `critical: 365` - in days |
 | `reboot` | That a reboot is required - only if it is: on Debian and Ubuntu if any package requires it, on other distros if the most recently installed kernel is not the running one | - |
+| `clock` | That the clock is not synchronized - only if it isn't, and only on Linux. Determined the same way as in `timedatectl`. | - |
 | `cores` | Number of CPU cores and their clock speed | - |
 | `load` | Load averages and number of CPU cores | `warning: 0.9`, `critical: 1.1` - per CPU core |
 | `cpu` | How the CPU time is spent: in user space, in the kernel, waiting for I/O and stolen by the hypervisor (the last two only on Linux) | `iowait: {warning: 10, critical: 25}`, `steal: {warning: 5, critical: 15}` - in % |
