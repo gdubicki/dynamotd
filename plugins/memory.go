@@ -37,7 +37,7 @@ func init() {
 	}, Memory, "memory")
 }
 
-const memoryLabel = "RAM"
+const memoryLabel = "Memory"
 
 // for mocking in tests
 var getVirtualMemory = mem.VirtualMemoryWithContext
