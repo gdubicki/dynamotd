@@ -79,7 +79,7 @@ Optional, but recommended: use [pre-commit](https://pre-commit.com) and install 
 
 ## TODO
 
-These features will be implemented in the future:
+These features ~~will~~ may be implemented in the future:
 
 * **Pluggable** - add custom lines with any label and any command(s) output as the value,
 * **Interactive mode** - show the output like `htop`, updated every 2 seconds,
