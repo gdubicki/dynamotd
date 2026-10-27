@@ -24,9 +24,8 @@ it, then something IS wrong with the server, isn't it?).
 ```
 curl -L https://github.com/gdubicki/dynamotd/releases/latest/download/dynamotd-linux-amd64 -o /usr/local/bin/dynamotd && chmod +x /usr/local/bin/dynamotd
 ```
-The Linux binaries are static, so they work on any distro. Alternatively, install the `.deb` or `.rpm` package
-from the [latest release](https://github.com/gdubicki/dynamotd/releases/latest) - it installs the binary
-as `/usr/bin/dynamotd` and the example config as `/etc/dynamotd.yaml`.
+The Linux binaries are static, so they work on any distro. Alternatively, install the `.deb` or `.rpm` package from the [latest release](https://github.com/gdubicki/dynamotd/releases/latest) - it installs the binary as `/usr/bin/dynamotd` and the example config as `/etc/dynamotd.yaml`.
+
 2. (Optionally) Configure with `/etc/dynamotd.yaml` file (or `~/.dynamotd/dynamotd.yaml`, or `dynamotd.yaml` in the current directory - the first one found is used). See the example config in [dynamotd.yaml](./dynamotd.yaml).
 
 3. Make it shown instead of or after your default static MOTD by editing `/etc/pam.d/sshd`. Find line with `pam_motd.so` and either replace or append this line to it:
