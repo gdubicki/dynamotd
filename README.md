@@ -13,10 +13,13 @@ it, then something IS wrong with the server, isn't it?).
 
 ## Features
 
-* **Useful default info** - CPU load, memory use, disk space use etc.,
+* **Useful default info** - CPU load and usage (incl. waiting for disk and stolen by hypervisor), memory and swap use, disk space use of all the filesystems that need attention, top processes when the load or memory use is high etc.,
+* **Shows problems only when there are any** - failed systemd units, OOM kills, required reboot, unsynchronized clock, other logged in users,
 * **Semantic colors** - <span style="color:red">red</span> → problem, <span style="color:yellow">yellow</span> → warning, <span style="color:green">green</span> → ok.
-* **Customizable** - reorder or remove lines,
-* **Fast** - native app,
+* **Never blocks your login** - the rows that don't finish in 1s (configurable), f.e. because of a broken DNS, are shown as "timed out",
+* **Customizable** - reorder or remove rows, change the thresholds, add rows with the output of your own commands,
+* **Fast** - native app, generating all the rows concurrently,
+* **Easy to install** - static binaries working on any Linux distro, and packages for Debian/Ubuntu and RedHat/Rocky/Fedora etc.
 
 ## Installation
 
@@ -51,6 +54,10 @@ session    optional     pam_exec.so stdout /usr/local/bin/dynamotd -force-color
 **Solution(s)**: there could be multiple reason for this.
 
 One of them is if you use SSH multiplexing (`ControlPath`, `ControlMaster`, `ControlPersist` in your SSH config) - then the MOTD will be shown only during creation of the first connection to the server. Read more about it [here](https://blog.plover.com/Unix/sshd.html).
+
+**Problem**: the OOM kills row shows only their number, without when the last one happened.
+
+**Solution**: that info comes from the kernel log, which on most distros only root can read. It is shown when dynamotd runs on login, as it runs as root then, and when you run it with `sudo`.
 
 TODO: expand this section as more cases are identified.
 
@@ -139,8 +146,7 @@ These features ~~will~~ may be implemented in the future:
 
 * **Interactive mode** - show the output like `htop`, updated every 2 seconds,
 * **Keyboard shortcuts** - in interactive mode only, to run popular tools like htop, iftop etc.
-* **Circuit-breaker** - minimal info mode in case of server overload detection,
-* **Native packages for RedHat/Centos/Rocky and Debian/Ubuntu** - easy install it on (almost) all of your servers.
+* **Circuit-breaker** - minimal info mode in case of server overload detection.
 
 We also don't have user docs, developer docs and contribution guide.
 
