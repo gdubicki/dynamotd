@@ -28,6 +28,7 @@ var defaultRows = rowConfigs(
 	"load",
 	"memory",
 	"diskspace",
+	"failedunits",
 )
 
 func rowConfigs(names ...string) []dynamotd.RowConfig {
