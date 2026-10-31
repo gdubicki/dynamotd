@@ -11,7 +11,7 @@ it, then something IS wrong with the server, isn't it?).
 
 When all is good, it shows the basic info about your server:
 
-<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/screenshot-all-good.png" width="923px" alt="screenshot of a server without problems">
+<img src="https://raw.githubusercontent.com/gdubicki/dynamotd/main/screenshot-all-good.png" width="760px" alt="screenshot of a server without problems">
 
 When there are problems, they are shown in yellow and red, and some rows appear only then:
 
