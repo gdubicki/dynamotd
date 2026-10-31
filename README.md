@@ -88,7 +88,7 @@ The `warning` and `critical` thresholds define when the value is shown in yellow
 |---|---|---|
 | `timestamp` | Current date and time | - |
 | `fqdn` | Fully qualified domain name | - |
-| `ip` | Local and external IP | - |
+| `ip` | Local and external IPv4 and IPv6 (the latter only if the machine has it), shown once if they are the same ("Public IPv4") | - |
 | `uptime` | Time since the last boot | `warning: 90`, `critical: 365` - in days |
 | `users` | Who else is logged in - only if anyone is | - |
 | `reboot` | That a reboot is required - only if it is: on Debian and Ubuntu if any package requires it, on other distros if the most recently installed kernel is not the running one | - |

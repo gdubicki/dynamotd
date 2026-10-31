@@ -24,22 +24,23 @@ import (
 var screenshotNow = time.Date(2026, 10, 27, 22, 30, 0, 0, time.Local)
 
 type scenario struct {
-	uptime        time.Duration
-	load          [3]float64
-	cpuBefore     cpu.TimesStat
-	cpuAfter      cpu.TimesStat
-	memory        mem.VirtualMemoryStat
-	swap          mem.SwapMemoryStat
-	oomKills      int
-	lastOOMKill   string
-	processes     []processSample
-	partitions    []disk.PartitionStat
-	usages        map[string]disk.UsageStat
-	failedUnits   []string
-	rebootPkgs    *string
-	clockInSync   bool
-	users         []string
-	externalIPErr error
+	uptime      time.Duration
+	load        [3]float64
+	cpuBefore   cpu.TimesStat
+	cpuAfter    cpu.TimesStat
+	memory      mem.VirtualMemoryStat
+	swap        mem.SwapMemoryStat
+	oomKills    int
+	lastOOMKill string
+	processes   []processSample
+	partitions  []disk.PartitionStat
+	usages      map[string]disk.UsageStat
+	failedUnits []string
+	rebootPkgs  *string
+	clockInSync bool
+	users       []string
+	localIPs    map[string]string
+	externalIPs map[string]string
 }
 
 const cores = 4
@@ -58,6 +59,7 @@ func (s scenario) apply(t *testing.T) {
 	bootTime := screenshotNow.Add(-s.uptime)
 	getBootTime = func() (uint64, error) { return uint64(bootTime.Unix()), nil }
 	now = func() time.Time { return screenshotNow }
+	mockIPs(t, s.localIPs, s.externalIPs)
 	readKernelLog = func() ([]string, error) {
 		if s.lastOOMKill == "" {
 			return []string{"6,1,1000000,-;Linux version 6.8.0-45-generic"}, nil
@@ -101,14 +103,13 @@ func (s scenario) apply(t *testing.T) {
 }
 
 // rows in the default order, using the real row types where they can be fed with example data,
-// and the same formatting as the real ones for the others (timestamp, FQDN, IP, uptime, load)
+// and the same formatting as the real ones for the others (timestamp, FQDN, uptime, load)
 func (s scenario) rows(t *testing.T) []dynamotd.Row {
 	ctx := context.Background()
 	single := func(label string, value ...dynamotd.ColorString) []dynamotd.Row {
 		return []dynamotd.Row{{Label: dynamotd.SingleColorLabel(label), Value: dynamotd.ToColorText(value...)}}
 	}
 
-	externalIP := ipColorString("203.0.113.45", s.externalIPErr)
 	uptimeSeconds := uint64(s.uptime.Seconds())
 	uptimeThresholds := dynamotd.Thresholds{Warning: 90, Critical: 365}
 	loadThresholds := dynamotd.Thresholds{Warning: 0.9, Critical: 1.1}
@@ -122,7 +123,7 @@ func (s scenario) rows(t *testing.T) []dynamotd.Row {
 		Clock(ctx, dynamotd.NoSettings{}),
 		{{}},
 		single(fqdnLabel, dynamotd.ValueNeutral("web01.example.com")),
-		single(ipLabel, ipColorString("10.0.1.23", nil), dynamotd.ValueDescription(" (external: "), externalIP, dynamotd.ValueDescription(")")),
+		Ip(ctx),
 		single(uptimeLabel, dynamotd.ColorString{Color: GetUptimeColor(uptimeSeconds, uptimeThresholds), Text: GetUptimeString(uptimeSeconds)}),
 		RebootRequired(ctx, dynamotd.NoSettings{}),
 		{{}},
@@ -170,6 +171,8 @@ func TestScreenshots(t *testing.T) {
 		partitions:  []disk.PartitionStat{{Device: "/dev/sda1", Mountpoint: "/", Fstype: "ext4"}},
 		usages:      map[string]disk.UsageStat{"/": {Total: 100 * gib, Used: 38*gib + gib/5, UsedPercent: 38.2, InodesTotal: 1000, InodesUsedPercent: 12}},
 		clockInSync: true,
+		localIPs:    map[string]string{"IPv4": "10.0.1.23"},
+		externalIPs: map[string]string{"IPv4": "203.0.113.45"},
 	}
 
 	rebootPkgs := "linux-image-6.8.0-51-generic\nlibc6\nopenssl\nsystemd\n"
@@ -197,11 +200,12 @@ func TestScreenshots(t *testing.T) {
 			"/var":      {Total: 200 * gib, Used: 194 * gib, UsedPercent: 97, InodesTotal: 1000, InodesUsedPercent: 20},
 			"/srv/data": {Total: 500 * gib, Used: 61 * gib, UsedPercent: 12.2, InodesTotal: 1000, InodesUsedPercent: 96},
 		},
-		failedUnits:   []string{"nginx.service", "backup.timer"},
-		rebootPkgs:    &rebootPkgs,
-		clockInSync:   false,
-		users:         []string{"alice", "bob", "bob"},
-		externalIPErr: fmt.Errorf("timed out"),
+		failedUnits: []string{"nginx.service", "backup.timer"},
+		rebootPkgs:  &rebootPkgs,
+		clockInSync: false,
+		users:       []string{"alice", "bob", "bob"},
+		localIPs:    map[string]string{"IPv4": "10.0.1.23", "IPv6": "2001:db8:1::23"},
+		externalIPs: map[string]string{"IPv6": "2001:db8:1::23"},
 	}
 
 	outDir := os.Getenv("SCREENSHOTS_DIR")
