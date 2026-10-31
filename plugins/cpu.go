@@ -13,9 +13,22 @@ import (
 
 type cpuUsageSettings struct {
 	// thresholds for the time spent waiting for I/O, in %
-	IOWait dynamotd.Thresholds `yaml:"iowait"`
+	IOWait cpuTimeThresholds `yaml:"iowait"`
 	// thresholds for the time stolen by the hypervisor from this VM, in %
-	Steal dynamotd.Thresholds `yaml:"steal"`
+	Steal cpuTimeThresholds `yaml:"steal"`
+}
+
+type cpuTimeThresholds struct {
+	// the value is shown only if it's at least this, as low values are normal and just make the line longer
+	Show                float64 `yaml:"show"`
+	dynamotd.Thresholds `yaml:",inline"`
+}
+
+func (thresholds cpuTimeThresholds) Validate() error {
+	if thresholds.Show > thresholds.Warning {
+		return fmt.Errorf("show threshold (%v) is higher than the warning one (%v)", thresholds.Show, thresholds.Warning)
+	}
+	return thresholds.Thresholds.Validate()
 }
 
 func (settings cpuUsageSettings) Validate() error {
@@ -30,8 +43,8 @@ func (settings cpuUsageSettings) Validate() error {
 
 func init() {
 	dynamotd.Register(cpuUsageLabel, cpuUsageSettings{
-		IOWait: dynamotd.Thresholds{Warning: 10, Critical: 25},
-		Steal:  dynamotd.Thresholds{Warning: 5, Critical: 15},
+		IOWait: cpuTimeThresholds{Show: 5, Thresholds: dynamotd.Thresholds{Warning: 10, Critical: 25}},
+		Steal:  cpuTimeThresholds{Show: 2, Thresholds: dynamotd.Thresholds{Warning: 5, Critical: 15}},
 	}, CPUUsage, "cpu")
 }
 
@@ -100,7 +113,7 @@ func CPUUsage(ctx context.Context, settings cpuUsageSettings) []dynamotd.Row {
 	}
 	percent := func(value float64) float64 { return value / total * 100 }
 
-	// f.e. "25% busy (16% user, 9% kernel), 30% waiting for disk, 0% stolen by hypervisor"
+	// f.e. "25% busy (16% user, 9% kernel), 30% waiting for disk, 3% stolen by hypervisor"
 	value := []dynamotd.ColorString{
 		dynamotd.ValueNeutral(fmt.Sprintf("%.0f%%", percent(user+system))),
 		dynamotd.ValueDescription(" busy ("),
@@ -110,13 +123,23 @@ func CPUUsage(ctx context.Context, settings cpuUsageSettings) []dynamotd.Row {
 		dynamotd.ValueDescription(" kernel)"),
 	}
 	if showIOWaitAndSteal {
-		value = append(value,
-			dynamotd.ValueDescription(", "),
-			dynamotd.ColorString{Color: settings.IOWait.Color(percent(ioWait)), Text: fmt.Sprintf("%.0f%%", percent(ioWait))},
-			dynamotd.ValueDescription(" waiting for disk, "),
-			dynamotd.ColorString{Color: settings.Steal.Color(percent(steal)), Text: fmt.Sprintf("%.0f%%", percent(steal))},
-			dynamotd.ValueDescription(" stolen by hypervisor"),
-		)
+		for _, cpuTime := range []struct {
+			percent     float64
+			thresholds  cpuTimeThresholds
+			description string
+		}{
+			{percent(ioWait), settings.IOWait, " waiting for disk"},
+			{percent(steal), settings.Steal, " stolen by hypervisor"},
+		} {
+			if cpuTime.percent < cpuTime.thresholds.Show {
+				continue
+			}
+			value = append(value,
+				dynamotd.ValueDescription(", "),
+				dynamotd.ColorString{Color: cpuTime.thresholds.Color(cpuTime.percent), Text: fmt.Sprintf("%.0f%%", cpuTime.percent)},
+				dynamotd.ValueDescription(cpuTime.description),
+			)
+		}
 	}
 
 	return []dynamotd.Row{{

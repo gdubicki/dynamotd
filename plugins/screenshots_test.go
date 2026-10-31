@@ -130,7 +130,7 @@ func (s scenario) rows(t *testing.T) []dynamotd.Row {
 		{{}},
 		single(loadLabel, load(s.load[0]), dynamotd.ValueDescription(" / "), load(s.load[1]), dynamotd.ValueDescription(" / "), load(s.load[2]),
 			dynamotd.ValueDescription(" with "), dynamotd.ValueNeutral(fmt.Sprintf("%d", cores)), dynamotd.ValueDescription(" cores at "), dynamotd.ValueNeutral("3500 MHz")),
-		CPUUsage(ctx, cpuUsageSettings{IOWait: dynamotd.Thresholds{Warning: 10, Critical: 25}, Steal: dynamotd.Thresholds{Warning: 5, Critical: 15}}),
+		CPUUsage(ctx, defaultCPUUsageSettings),
 		TopProcesses(ctx, topProcessesSettings{Load: 0.9, Memory: 90, Count: 3}),
 		Memory(ctx, memorySettings{Thresholds: dynamotd.Thresholds{Warning: 90, Critical: 95}, Swap: dynamotd.Thresholds{Warning: 50, Critical: 80}}),
 		OOMKills(ctx, dynamotd.NoSettings{}),
