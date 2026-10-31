@@ -129,7 +129,7 @@ How to build for your current OS and arch (the output name is needed, as `dynamo
 go build -o dynamotd-dev
 ```
 
-How to build all the release binaries and packages locally (requires [GoReleaser](https://goreleaser.com)):
+How to build all the release binaries and packages locally (requires [GoReleaser](https://goreleaser.com) v2.6 or newer):
 ```
 goreleaser release --snapshot --clean
 ```
