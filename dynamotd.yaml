@@ -19,6 +19,7 @@ rows:
   - ip
   - uptime
   - reboot
+  - distro
   -
   - users
   -

@@ -39,6 +39,7 @@ type scenario struct {
 	rebootPkgs  *string
 	clockInSync bool
 	users       []string
+	osRelease   string
 	localIPs    map[string]string
 	externalIPs map[string]string
 }
@@ -93,6 +94,13 @@ func (s scenario) apply(t *testing.T) {
 
 	clockSynchronized = func() (bool, bool) { return s.clockInSync, true }
 
+	osReleasePaths = []string{dir + "/os-release"}
+	require.NoError(t, os.WriteFile(osReleasePaths[0], []byte(s.osRelease), 0o644))
+	eolCacheDir = func() (string, error) { return dir + "/cache", nil }
+	fetchEOLReleases = func(context.Context, string) ([]eolRelease, error) {
+		return []eolRelease{{Name: "20.04", EOLFrom: "2025-05-31"}, {Name: "24.04", EOLFrom: "2029-05-31"}}, nil
+	}
+
 	getUsers = func(context.Context) ([]host.UserStat, error) {
 		var users []host.UserStat
 		for _, user := range s.users {
@@ -126,6 +134,7 @@ func (s scenario) rows(t *testing.T) []dynamotd.Row {
 		Ip(ctx),
 		single(uptimeLabel, dynamotd.ColorString{Color: GetUptimeColor(uptimeSeconds, uptimeThresholds), Text: GetUptimeString(uptimeSeconds)}),
 		RebootRequired(ctx, dynamotd.NoSettings{}),
+		Distro(ctx, distroSettings{Warning: 90, Critical: 0}),
 		{{}},
 		Users(ctx, dynamotd.NoSettings{}),
 		{{}},
@@ -171,11 +180,12 @@ func TestScreenshots(t *testing.T) {
 		partitions:  []disk.PartitionStat{{Device: "/dev/sda1", Mountpoint: "/", Fstype: "ext4"}},
 		usages:      map[string]disk.UsageStat{"/": {Total: 100 * gib, Used: 38*gib + gib/5, UsedPercent: 38.2, InodesTotal: 1000, InodesUsedPercent: 12}},
 		clockInSync: true,
+		osRelease:   "PRETTY_NAME=\"Ubuntu 24.04.1 LTS\"\nID=ubuntu\nVERSION_ID=\"24.04\"\n",
 		localIPs:    map[string]string{"IPv4": "10.0.1.23"},
 		externalIPs: map[string]string{"IPv4": "203.0.113.45"},
 	}
 
-	rebootPkgs := "linux-image-6.8.0-51-generic\nlibc6\nopenssl\nsystemd\n"
+	rebootPkgs := "linux-image-5.15.0-139-generic\nlibc6\nopenssl\nsystemd\n"
 	allProblems := scenario{
 		uptime:    400*day + 3*time.Hour + 12*time.Minute,
 		load:      [3]float64{7.92, 6.41, 4.13},
@@ -203,6 +213,7 @@ func TestScreenshots(t *testing.T) {
 		failedUnits: []string{"nginx.service", "backup.timer"},
 		rebootPkgs:  &rebootPkgs,
 		clockInSync: false,
+		osRelease:   "PRETTY_NAME=\"Ubuntu 20.04.6 LTS\"\nID=ubuntu\nVERSION_ID=\"20.04\"\n",
 		users:       []string{"alice", "bob", "bob"},
 		localIPs:    map[string]string{"IPv4": "10.0.1.23", "IPv6": "2001:db8:1::23"},
 		externalIPs: map[string]string{"IPv6": "2001:db8:1::23"},

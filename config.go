@@ -28,6 +28,7 @@ var defaultRows = rowConfigs(
 	"ip",
 	"uptime",
 	"reboot",
+	"distro",
 	"",
 	"users",
 	"",
