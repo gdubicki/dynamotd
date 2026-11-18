@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"fmt"
+	"math"
 	"runtime"
 
 	"github.com/gdubicki/dynamotd/dynamotd"
@@ -37,7 +38,7 @@ func getCoresDescription() ([]dynamotd.ColorString, error) {
 	if len(cpuStat) == 0 {
 		return nil, fmt.Errorf("no CPU info")
 	}
-	mhz := int(cpuStat[0].Mhz)
+	mhz := int(math.Round(cpuStat[0].Mhz))
 
 	unit := "core"
 	if cores >= 2 {
